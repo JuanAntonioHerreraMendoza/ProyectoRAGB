@@ -9,6 +9,14 @@ export const getReportes = async () => {
   return res;
 };
 
+export const getUsuarios = async () => {
+  let res = [];
+  await axios.get(Apiurl + "usuarios/usuarioslist").then((response) => {
+    res = response.data;
+  });
+  return res;
+};
+
 export const getReporte = async (id) => {
   let res = {};
   await axios.get(Apiurl + "reportes/rep?id=" + id).then((response) => {
