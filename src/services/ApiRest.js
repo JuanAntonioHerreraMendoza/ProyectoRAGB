@@ -17,6 +17,22 @@ export const getUsuarios = async () => {
   return res;
 };
 
+export const getUsuariosPosibles = async () => {
+  let res = [];
+  await axios.get(Apiurl + "posibleUsuario").then((response) => {
+    res = response.data;
+  });
+  return res;
+};
+
+export const getUsuario = async (id) => {
+  let res = {};
+  await axios.get(Apiurl + "usuarios/getUsuario?id="+id).then((response) => {
+    res = response.data;
+  });
+  return res;
+};
+
 export const getReporte = async (id) => {
   let res = {};
   await axios.get(Apiurl + "reportes/rep?id=" + id).then((response) => {
@@ -29,6 +45,16 @@ export const cambiarEstatus = async (id, estatus) => {
   let res = {};
   await axios
     .post(Apiurl + "reportes/changeEstatus?id=" + id + "&estatus=" + estatus)
+    .then((response) => {
+      res = response.data;
+    });
+  return res;
+};
+
+export const editarUsuario = async (user) => {
+  let res = {};
+  await axios
+    .put(Apiurl + "usuarios/editarUsuario",user)
     .then((response) => {
       res = response.data;
     });
@@ -50,3 +76,20 @@ export const getConductorInfo = async (licencia, circulacion, placas) => {
   });
   return res;
 };
+
+export const suspenderUsuario = async (usuario,fecha) => {
+  let res = "";
+  await axios.post(Apiurl +"usuarios/suspender?usuario="+usuario+"&fecha="+fecha).then((response) => {
+    res = response.status;
+  });
+  console.log(res);
+};
+
+export const enviarCorreo = async (usuario) => {
+  let res = "";
+  await axios.post(Apiurl +"correo/correoReporte").then((response) => {
+    res = response.status;
+  });
+  console.log(res);
+};
+

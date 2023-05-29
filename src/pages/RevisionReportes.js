@@ -334,7 +334,7 @@ function RevisionReportes() {
               onClick={() => {
                 setIsOpenAceptar(!modalIsOpenAceptar);
                 AceptarReporte(reporte);
-                //navigate("/reportes");
+                navigate("/reportes");
               }}
             >
               Confirmar
