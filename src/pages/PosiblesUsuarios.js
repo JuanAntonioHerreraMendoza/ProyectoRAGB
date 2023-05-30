@@ -1,19 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
 import NavBarAdmin from "../components/NavBarAdmin";
 import NavBarSupervisor from "../components/NavBarSupervisor";
-import {
-  editarUsuario,
-  getUsuario,
-  getUsuarios,
-  getUsuariosPosibles,
-  suspenderUsuario,
-} from "../services/ApiRest";
+import { getUsuariosPosibles } from "../services/ApiRest";
 import { useTable, usePagination, useGlobalFilter } from "react-table";
 import FiltroGlobal from "../components/FiltroGlobal";
-import { Button, Modal } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 function PosiblesUsuarios() {
   let tipoUsuario = localStorage.getItem("idtipousuario");
+  const navigate = useNavigate();
   const [usuariosP, setUsuariosP] = useState([]);
 
   const columns = useMemo(
@@ -42,7 +37,12 @@ function PosiblesUsuarios() {
         Header: "Acciones",
         Cell: ({ cell }) => (
           <div>
-            <button className="btn btn-primary" onClick={() => {}}>
+            <button
+              className="btn btn-primary"
+              onClick={() => {
+                navigate("/revisionUsuarios?id=" + cell.row.values.idposibleusuario);
+              }}
+            >
               <ion-icon name="pencil"></ion-icon>
             </button>
           </div>
@@ -78,10 +78,6 @@ function PosiblesUsuarios() {
     return await getUsuariosPosibles();
   };
 
-  const obtenerUsuario = async (id) => {
-    return await getUsuario(id);
-  };
-
   useEffect(() => {
     obtenerUsuarios().then((data) => {
       setUsuariosP(data);
@@ -95,7 +91,7 @@ function PosiblesUsuarios() {
       {tipoUsuario === "1" ? <NavBarSupervisor /> : <NavBarAdmin />}
       <div className="reports">
         <div className="container-fluid table-responsive">
-          <h1>Reportes</h1>
+          <h1>Solicitudes de usuarios</h1>
           <div className="d-flex justify-content-center mx-3">
             <FiltroGlobal filter={globalFilter} setFilter={setGlobalFilter} />
           </div>

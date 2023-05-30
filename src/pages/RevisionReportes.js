@@ -4,6 +4,7 @@ import NavBarAdmin from "../components/NavBarAdmin";
 import NavBarSupervisor from "../components/NavBarSupervisor";
 import {
   cambiarEstatus,
+  enviarCorreoReporte,
   getConductorInfo,
   getReporte,
   nuevaMulta,
@@ -57,20 +58,20 @@ function RevisionReportes() {
     });
   };
   const denegarReporte = () => {
-    cambiarEstatus(reporte.idreporte, "Rechazado").catch((error) =>
-      alert(error)
-    );
+    if (datoConductor === "" || multa.monto === "" || multa.razon === "") {
+      return setAlerta(true);
+    }
+    cambiarEstatus(reporte.idreporte, "Rechazado")
+      .then(enviarCorreoReporte(reporte.idreportadorfk.correo, false))
+      .catch((error) => alert(error));
+    navigate("/reportes");
   };
   const AceptarReporte = async (reporte) => {
     multa.idreportadorfk = reporte.idreportadorfk;
     multa.personal.idpersonal = "1";
-    multa.reportefk.idreporte=reporte.idreporte
-    multa.infraccion=reporte.razon;
-    if (
-      datoConductor=== "" ||
-      multa.monto === "" ||
-      multa.razon === ""
-    ) {
+    multa.reportefk.idreporte = reporte.idreporte;
+    multa.infraccion = reporte.razon;
+    if (datoConductor === "" || multa.monto === "" || multa.razon === "") {
       return setAlerta(true);
     }
     multa.idconductorfk = await getConductorInfo(
@@ -78,12 +79,13 @@ function RevisionReportes() {
       datoConductor,
       datoConductor
     );
-    console.log(multa)
-     nuevaMulta(multa).then(
-       cambiarEstatus(reporte.idreporte, "Aceptado")
-         .then(console.log("Listo"))
-         .catch((error) => console.error(error))
-     );
+    nuevaMulta(multa).then(
+      cambiarEstatus(reporte.idreporte, "Aceptado")
+        .then()
+        .catch((error) => console.error(error))
+    );
+    await enviarCorreoReporte(reporte.idreportadorfk.correo, true);
+    navigate("/reportes");
   };
 
   useEffect(() => {
@@ -334,7 +336,6 @@ function RevisionReportes() {
               onClick={() => {
                 setIsOpenAceptar(!modalIsOpenAceptar);
                 AceptarReporte(reporte);
-                navigate("/reportes");
               }}
             >
               Confirmar
@@ -361,7 +362,6 @@ function RevisionReportes() {
               onClick={() => {
                 setIsOpenRechazar(!modalIsOpenRechazar);
                 denegarReporte();
-                navigate("/reportes");
               }}
             >
               Confirmar

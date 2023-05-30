@@ -12,6 +12,7 @@ import Usuarios from "./pages/Usuarios";
 import Configuracion from "./pages/Configuracion";
 import RevisionReportes from "./pages/RevisionReportes";
 import PosiblesUsuarios from "./pages/PosiblesUsuarios";
+import RevisionUsuarios from "./pages/RevisionUsuarios";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
         <Route path="/usuarios" element={<Usuarios />} />
         <Route path="/revisionReportes" element={<RevisionReportes />} />
         <Route path="/posiblesUsuarios" element={<PosiblesUsuarios />} />
+        <Route path="/revisionUsuarios" element={<RevisionUsuarios />} />
       </Routes>
     </>
   );

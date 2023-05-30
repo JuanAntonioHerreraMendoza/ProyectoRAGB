@@ -496,7 +496,7 @@ function Usuarios() {
         </Modal.Header>
         <Modal.Body>
           <label className="form-label">Fecha de suspension</label>
-          <input type="date" name="fecha" className="form-control" onChange={(e)=>setFecha(Date(e.target.value))}/>
+          <input type="date" name="fecha" className="form-control" onChange={(e)=>setFecha(e.target.value)}/>
         </Modal.Body>
         <Modal.Footer>
           <Button

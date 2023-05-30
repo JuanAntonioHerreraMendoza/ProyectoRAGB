@@ -17,13 +17,6 @@ export const getUsuarios = async () => {
   return res;
 };
 
-export const getUsuariosPosibles = async () => {
-  let res = [];
-  await axios.get(Apiurl + "posibleUsuario").then((response) => {
-    res = response.data;
-  });
-  return res;
-};
 
 export const getUsuario = async (id) => {
   let res = {};
@@ -32,6 +25,41 @@ export const getUsuario = async (id) => {
   });
   return res;
 };
+
+export const getUsuariosPosibles = async () => {
+  let res = [];
+  await axios.get(Apiurl + "posibleUsuario").then((response) => {
+    res = response.data;
+  });
+  return res;
+};
+
+export const getUsuarioPosible = async (id) => {
+  let res = {};
+  await axios.get(Apiurl + "posibleUsuario/getPorId?id="+id).then((response) => {
+    res = response.data;
+  });
+  return res;
+};
+
+
+export const deleteUsuarioPosible = async (id) => {
+  let res = {};
+  await axios.delete(Apiurl + "posibleUsuario?id="+id).then((response) => {
+    res = response.data;
+  });
+  return res;
+};
+
+
+export const aceptarUsuarioPosible = async (user) => {
+  let res = 0;
+  await axios.post(Apiurl + "usuarios/usuarioR",user).then((response) => {
+    res = response.data;
+  });
+  return res;
+};
+
 
 export const getReporte = async (id) => {
   let res = {};
@@ -85,9 +113,17 @@ export const suspenderUsuario = async (usuario,fecha) => {
   console.log(res);
 };
 
-export const enviarCorreo = async (usuario) => {
+export const enviarCorreoReporte = async (usuario,resultado) => {
   let res = "";
-  await axios.post(Apiurl +"correo/correoReporte").then((response) => {
+  await axios.post(Apiurl +"correo/correoReporte?correo="+usuario+"&resultado="+resultado).then((response) => {
+    res = response.status;
+  });
+  console.log(res);
+};
+
+export const enviarCorreoUsuarioPosible = async (usuario,resultado) => {
+  let res = "";
+  await axios.post(Apiurl +"correo/correoUsuario?correo="+usuario+"&resultado="+resultado).then((response) => {
     res = response.status;
   });
   console.log(res);
