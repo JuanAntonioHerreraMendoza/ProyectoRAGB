@@ -1,61 +1,63 @@
 import React, { useEffect, useMemo, useState } from "react";
-import NavBarAdmin from "../components/NavBarAdmin";
 import NavBarSupervisor from "../components/NavBarSupervisor";
-import { getUsuariosPosibles } from "../services/ApiRest";
-import { useTable, usePagination, useGlobalFilter } from "react-table";
+import NavBarAdmin from "../components/NavBarAdmin";
+import SinAcceso from "../components/SinAcceso";
 import FiltroGlobal from "../components/FiltroGlobal";
+import { useGlobalFilter, usePagination, useTable } from "react-table";
 import { useNavigate } from "react-router-dom";
-import SinAccesso from "../components/SinAcceso";
+import { getMultas } from "../services/ApiRest";
 
-function PosiblesUsuarios() {
+function Multas() {
   let tipoUsuario = sessionStorage.getItem("idtipousuario");
   const navigate = useNavigate();
-  const [usuariosP, setUsuariosP] = useState([]);
-
+  const [multas, setMultas] = useState([]);
   const columns = useMemo(
     () => [
       {
         Header: "ID",
-        accessor: "idposibleusuario", // accessor is the "key" in the data
+        accessor: "idmulta", // accessor is the "key" in the data
       },
       {
-        Header: "Nombre",
-        accessor: "nombres", // accessor is the "key" in the data
+        Header: "Infraccion",
+        accessor: "infraccion", // accessor is the "key" in the data
       },
       {
-        Header: "Apellido paterno",
-        accessor: "apellidop",
+        Header: "Razon",
+        accessor: "razon",
       },
       {
-        Header: "Apellido materno",
-        accessor: "apellidom",
+        Header: "Monto",
+        accessor: "monto",
       },
       {
-        Header: "Usuario",
-        accessor: "usuario",
+        Header: "Estatus",
+        accessor: (d) => {
+          return d.estatus ? "Pagada" : "Sin pago";
+        },
       },
+      //   {
+      //     Header: "Reportador",
+      //     accessor: "idreportadorfk.nombres",
+      //   },
       {
         Header: "Acciones",
         Cell: ({ cell }) => (
-          <div>
-            <button
-              className="btn btn-primary"
-              onClick={() => {
-                navigate(
-                  "/revisionUsuarios?id=" + cell.row.values.idposibleusuario
-                );
-              }}
-            >
-              <ion-icon name="pencil"></ion-icon>
-            </button>
-          </div>
+          <button
+            className="btn btn-primary"
+            title="Revisar"
+            onClick={() => {
+              navigate("/revisionMulta?id=" + cell.row.values.idmulta);
+            }}
+          >
+            <ion-icon name="pencil"></ion-icon>
+          </button>
         ),
       },
     ],
     []
   );
   const tableInstance = useTable(
-    { columns, data: usuariosP },
+    { columns, data: multas },
     useGlobalFilter,
     usePagination
   );
@@ -77,14 +79,12 @@ function PosiblesUsuarios() {
 
   const { pageIndex, globalFilter } = state;
 
-  const obtenerUsuarios = async () => {
-    return await getUsuariosPosibles();
+  const obtenerMultas = async () => {
+    return await getMultas();
   };
 
   useEffect(() => {
-    obtenerUsuarios().then((data) => {
-      setUsuariosP(data);
-    });
+    obtenerMultas().then((data) => setMultas(data));
     setPageSize(10);
   }, []);
 
@@ -93,16 +93,55 @@ function PosiblesUsuarios() {
       {tipoUsuario === "1" ? (
         <>
           <NavBarSupervisor />
-          <div className="reports">
+          <div className="reports text-center">
             <div className="container-fluid table-responsive">
-              <h1>Solicitudes de usuarios</h1>
+              <h1>Multas</h1>
               <div className="d-flex justify-content-center mx-3">
                 <FiltroGlobal
                   filter={globalFilter}
                   setFilter={setGlobalFilter}
                 />
               </div>
-              <table className="table-dark mt-2 " {...getTableProps()}>
+              <div
+                className="container-fluid btn-group mb-2"
+                role="group"
+                aria-label="Basic checkbox toggle button group"
+              >
+                <input
+                  type="checkbox"
+                  className="btn-check"
+                  id="btncheck1"
+                  autoComplete="off"
+                  onClick={(e) => {
+                    if (e.target.checked === true) {
+                      setGlobalFilter("Pagada");
+                    } else {
+                      setGlobalFilter("");
+                    }
+                  }}
+                />
+                <label className="btn btn-dark" htmlFor="btncheck1">
+                  Multas pagadas
+                </label>
+
+                <input
+                  type="checkbox"
+                  className="btn-check"
+                  id="btncheck2"
+                  autoComplete="off"
+                  onClick={(e) => {
+                    if (e.target.checked === true) {
+                      setGlobalFilter("Sin pago");
+                    } else {
+                      setGlobalFilter("");
+                    }
+                  }}
+                />
+                <label className="btn btn-dark" htmlFor="btncheck2">
+                  Multa sin pago
+                </label>
+              </div>
+              <table className="table-dark " {...getTableProps()}>
                 <thead>
                   {
                     // Loop over the header rows
@@ -158,47 +197,17 @@ function PosiblesUsuarios() {
                   }
                 </tbody>
               </table>
-              <div className="container mt-2 text-center justify-content-end fs-5">
-                <div className="container row">
-                  <span>
-                    Pagina{" "}
-                    <strong>
-                      {pageIndex + 1} de {pageOptions.length}
-                    </strong>
-                  </span>
-                </div>
-                <div>
-                  <button
-                    className="btn btn-dark me-md-2"
-                    onClick={() => {
-                      previousPage();
-                    }}
-                    disabled={!canPreviousPage}
-                  >
-                    Anterior
-                  </button>
-                  <button
-                    onClick={() => {
-                      nextPage();
-                    }}
-                    className="btn btn-dark"
-                    disabled={!canNextPage}
-                  >
-                    Siguiente
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
         </>
       ) : (
         <>
           <NavBarAdmin />
-          <SinAccesso />
+          <SinAcceso />
         </>
       )}
     </>
   );
 }
 
-export default PosiblesUsuarios;
+export default Multas;

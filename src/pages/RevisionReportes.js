@@ -5,6 +5,7 @@ import NavBarSupervisor from "../components/NavBarSupervisor";
 import {
   cambiarEstatus,
   enviarCorreoReporte,
+  enviarNotificacion,
   getConductorInfo,
   getReporte,
   nuevaMulta,
@@ -13,10 +14,11 @@ import { MapContainer, Marker, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import SinAcceso from "../components/SinAcceso";
 
 function RevisionReportes() {
   const navigate = useNavigate();
-  let tipoUsuario = localStorage.getItem("idtipousuario");
+  let tipoUsuario = sessionStorage.getItem("idtipousuario");
 
   const [alerta, setAlerta] = useState(false);
   const [modalIsOpen, setIsOpen] = useState(false);
@@ -63,7 +65,11 @@ function RevisionReportes() {
     }
     cambiarEstatus(reporte.idreporte, "Rechazado")
       .then(enviarCorreoReporte(reporte.idreportadorfk.correo, false))
-      .catch((error) => alert(error));
+      .catch((error) => {
+        alert(error);
+        return;
+      });
+    enviarNotificacion("ExponentPushToken[wg6ucrGk7QmGEUntUUBuNR]", false);
     navigate("/reportes");
   };
   const AceptarReporte = async (reporte) => {
@@ -79,12 +85,15 @@ function RevisionReportes() {
       datoConductor,
       datoConductor
     );
-    nuevaMulta(multa).then(
-      cambiarEstatus(reporte.idreporte, "Aceptado")
-        .then()
-        .catch((error) => console.error(error))
-    );
+    nuevaMulta(multa)
+      .then(
+        cambiarEstatus(reporte.idreporte, "Aceptado")
+          .then()
+          .catch((error) => console.error(error))
+      )
+      .catch((error) => console.error(error));
     await enviarCorreoReporte(reporte.idreportadorfk.correo, true);
+    await enviarNotificacion("ExponentPushToken[wg6ucrGk7QmGEUntUUBuNR]", true);
     navigate("/reportes");
   };
 
@@ -99,276 +108,309 @@ function RevisionReportes() {
   }, []);
   return (
     <>
-      {tipoUsuario === "1" ? <NavBarSupervisor /> : <NavBarAdmin />}
-
-      <div className="container">
-        <div className="container text-center">
-          <div className="row align-items-start">
-            <div className="col">
-              <ul className="list-group mt-4">
-                <li className="list-group-item list-group-item-dark">Fecha</li>
-                <li className="list-group-item list-group-item-secondary">
-                  {reporte.fecha}
-                </li>
-              </ul>
-              <ul className="list-group mt-4">
-                <li className="list-group-item list-group-item-dark">
-                  Direccion
-                </li>
-                <li className="list-group-item list-group-item-secondary">
-                  {reporte.direccion}
-                </li>
-              </ul>
-              <ul className="list-group mt-4">
-                <li className="list-group-item list-group-item-dark">Razon</li>
-                <li className="list-group-item list-group-item-secondary">
-                  {reporte.razon}
-                </li>
-              </ul>
-              <ul className="list-group mt-4">
-                <li className="list-group-item list-group-item-dark">
-                  Descripcion
-                </li>
-                <li className="list-group-item list-group-item-secondary">
-                  {reporte.descripcion}
-                </li>
-              </ul>
+      {tipoUsuario === "1" ? (
+        <>
+          <NavBarSupervisor />{" "}
+          <div className="container">
+            <div className="container text-center">
+              <div className="row align-items-start">
+                <div className="col">
+                  <ul className="list-group mt-4">
+                    <li className="list-group-item list-group-item-dark">
+                      Fecha
+                    </li>
+                    <li className="list-group-item list-group-item-secondary">
+                      {reporte.fecha}
+                    </li>
+                  </ul>
+                  <ul className="list-group mt-4">
+                    <li className="list-group-item list-group-item-dark">
+                      Direccion
+                    </li>
+                    <li className="list-group-item list-group-item-secondary">
+                      {reporte.direccion}
+                    </li>
+                  </ul>
+                  <ul className="list-group mt-4">
+                    <li className="list-group-item list-group-item-dark">
+                      Razon
+                    </li>
+                    <li className="list-group-item list-group-item-secondary">
+                      {reporte.razon}
+                    </li>
+                  </ul>
+                  <ul className="list-group mt-4">
+                    <li className="list-group-item list-group-item-dark">
+                      Descripcion
+                    </li>
+                    <li className="list-group-item list-group-item-secondary">
+                      {reporte.descripcion}
+                    </li>
+                  </ul>
+                </div>
+                <div className="col">
+                  <ul className="list-group mt-4">
+                    <li className="list-group-item list-group-item-dark">
+                      Evidencia
+                    </li>
+                    <li className="list-group-item list-group-item-secondary">
+                      {tipoArchivo === "mov" || tipoArchivo === "mp4" ? (
+                        <div>
+                          <video
+                            style={{ width: 400, height: 340 }}
+                            src={
+                              "http://192.168.1.75:8080/images/" +
+                              archivo +
+                              "?path=reportes"
+                            }
+                            controls
+                          />
+                        </div>
+                      ) : (
+                        <div>
+                          <img
+                            style={{ width: 400, height: 340 }}
+                            src={
+                              "http://192.168.1.75:8080/images/" +
+                              archivo +
+                              "?path=reportes"
+                            }
+                            alt=""
+                            onClick={() => {
+                              window.open(
+                                "http://192.168.1.75:8080/images/" +
+                                  archivo +
+                                  "?path=reportes"
+                              );
+                            }}
+                          />
+                        </div>
+                      )}
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
-            <div className="col">
+            <div className="container text-center">
               <ul className="list-group mt-4">
                 <li className="list-group-item list-group-item-dark">
-                  Evidencia
+                  Ubicacion
                 </li>
                 <li className="list-group-item list-group-item-secondary">
-                  {tipoArchivo === "mov" || tipoArchivo === "mp4" ? (
-                    <div>
-                      <video
-                        style={{ width: 400, height: 340 }}
-                        src={
-                          "http://192.168.1.75:8080/images/" +
-                          archivo +
-                          "?path=reportes"
-                        }
-                        controls
-                      />
+                  {" "}
+                  <div>
+                    {latitud === 0 ? (
+                      <></>
+                    ) : (
+                      <MapContainer
+                        center={{ lat: latitud, lng: longitud }}
+                        zoom={20}
+                        style={{ height: 500, zIndex: 0 }}
+                      >
+                        <TileLayer
+                          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        />
+                        <Marker position={{ lat: latitud, lng: longitud }} />
+                      </MapContainer>
+                    )}
+                  </div>
+                </li>
+              </ul>
+              <ul className="list-group mt-4">
+                <li className="list-group-item list-group-item-dark">
+                  Formulario
+                </li>
+                <li className="list-group-item list-group-item-secondary">
+                  {alerta ? (
+                    <div className="alert alert-danger" role="alert">
+                      Rellene todos los campos correctamente
                     </div>
                   ) : (
-                    <img
-                      style={{ width: 400, height: 340 }}
-                      src={
-                        "http://192.168.1.75:8080/images/" +
-                        archivo +
-                        "?path=reportes"
-                      }
-                      alt=""
-                    />
+                    <></>
                   )}
+                  <div className="mb-3">
+                    <label
+                      htmlFor="exampleFormControlInput1"
+                      className="form-label"
+                    >
+                      Conductor
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="exampleFormControlInput1"
+                      placeholder="Num. Licencia,Tarjeta de circulacion o Placas"
+                      onChange={(text) => {
+                        setDatoConductor(text.target.value);
+                      }}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label
+                      htmlFor="exampleFormControlInput1"
+                      className="form-label"
+                    >
+                      Monto
+                    </label>
+                    <select
+                      className="form-select"
+                      aria-label="Default select example"
+                      onChange={(e) => {
+                        manejadorChange(e);
+                      }}
+                    >
+                      <option defaultValue={"0"}>Seleccionar infraccion</option>
+                      <option value="1000">Mal estacionado</option>
+                      <option value="2000">Pasarse un alto</option>
+                      <option value="3000">Auto sin luces</option>
+                      <option value="4000">
+                        No usar el cinturón de seguridad
+                      </option>
+                      <option value="5000">Uso de celular al manejar</option>
+                    </select>
+                  </div>
+                  <div className="mb-3">
+                    <label
+                      htmlFor="exampleFormControlTextarea1"
+                      className="form-label"
+                    >
+                      Razon
+                    </label>
+                    <textarea
+                      className="form-control"
+                      id="exampleFormControlTextarea1"
+                      rows="3"
+                      placeholder="Escriba aqui..."
+                      name="razon"
+                      onChange={(e) => manejadorChange(e)}
+                    ></textarea>
+                  </div>
                 </li>
               </ul>
             </div>
-          </div>
-        </div>
-        <div className="container text-center">
-          <ul className="list-group mt-4">
-            <li className="list-group-item list-group-item-dark">Ubicacion</li>
-            <li className="list-group-item list-group-item-secondary">
-              {" "}
-              <div>
-                {latitud === 0 ? (
-                  <></>
-                ) : (
-                  <MapContainer
-                    center={{ lat: latitud, lng: longitud }}
-                    zoom={20}
-                    style={{ height: 500, zIndex: 0 }}
-                  >
-                    <TileLayer
-                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    <Marker position={{ lat: latitud, lng: longitud }} />
-                  </MapContainer>
-                )}
-              </div>
-            </li>
-          </ul>
-          <ul className="list-group mt-4">
-            <li className="list-group-item list-group-item-dark">Formulario</li>
-            <li className="list-group-item list-group-item-secondary">
-              {alerta ? (
-                <div className="alert alert-danger" role="alert">
-                  Rellene todos los campos correctamente
-                </div>
-              ) : (
-                <></>
-              )}
-              <div className="mb-3">
-                <label
-                  htmlFor="exampleFormControlInput1"
-                  className="form-label"
-                >
-                  Conductor
-                </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="exampleFormControlInput1"
-                  placeholder="Num. Licencia,Tarjeta de circulacion o Placas"
-                  onChange={(text) => {
-                    setDatoConductor(text.target.value);
+            <div className="my-3">
+              <label
+                htmlFor="exampleFormControlTextarea1"
+                className="form-label d-md-flex justify-content-md-end fs-5 fw-bold"
+              >
+                ¿Quiere proceder con el reporte?
+              </label>
+              <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+                <button
+                  type="button"
+                  className="btn btn-success mx-1"
+                  onClick={() => {
+                    setIsOpenAceptar(!modalIsOpenAceptar);
                   }}
-                />
-              </div>
-              <div className="mb-3">
-                <label
-                  htmlFor="exampleFormControlInput1"
-                  className="form-label"
                 >
-                  Monto
-                </label>
-                <input
-                  type="numeric"
-                  className="form-control"
-                  name="monto"
-                  id="exampleFormControlInput1"
-                  placeholder="Monto de la multa"
-                  onChange={(e) => manejadorChange(e)}
-                />
-              </div>
-              <div className="mb-3">
-                <label
-                  htmlFor="exampleFormControlTextarea1"
-                  className="form-label"
+                  Autorizar Reporte
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-danger mx-1"
+                  onClick={() => {
+                    setIsOpenRechazar(!modalIsOpenRechazar);
+                  }}
                 >
-                  Razon
-                </label>
-                <textarea
-                  className="form-control"
-                  id="exampleFormControlTextarea1"
-                  rows="3"
-                  placeholder="Escriba aqui..."
-                  name="razon"
-                  onChange={(e) => manejadorChange(e)}
-                ></textarea>
-                <div className="my-3">
-                  <label
-                    htmlFor="exampleFormControlTextarea1"
-                    className="form-label d-md-flex justify-content-md-end fs-5 fw-bold"
-                  >
-                    ¿Quiere proceder con la multa?
-                  </label>
-                  <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                    <button
-                      type="button"
-                      className="btn btn-success mx-1"
-                      onClick={() => {
-                        setIsOpenAceptar(!modalIsOpenAceptar);
-                      }}
-                    >
-                      Autorizar Reporte
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-danger mx-1"
-                      onClick={() => {
-                        setIsOpenRechazar(!modalIsOpenRechazar);
-                      }}
-                    >
-                      Denegar reporte
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      onClick={() => {
-                        setIsOpen(!modalIsOpen);
-                      }}
-                    >
-                      Cancelar
-                    </button>
-                  </div>
-                </div>
+                  Denegar reporte
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    setIsOpen(!modalIsOpen);
+                  }}
+                >
+                  Cancelar
+                </button>
               </div>
-            </li>
-          </ul>
-        </div>
-        <Modal style={{ color: "black" }} show={modalIsOpen}>
-          <Modal.Header>
-            <Modal.Title>Confirmacion</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>¿Esta seguro de cancelar la revision?</Modal.Body>
-          <Modal.Footer>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                setIsOpen(!modalIsOpen);
-              }}
-            >
-              Cancelar
-            </Button>
-            <Button
-              variant="primary"
-              onClick={() => {
-                setIsOpen(!modalIsOpen);
-                navigate("/reportes");
-              }}
-            >
-              Confirmar
-            </Button>
-          </Modal.Footer>
-        </Modal>
+            </div>
+            <Modal style={{ color: "black" }} show={modalIsOpen}>
+              <Modal.Header>
+                <Modal.Title>Confirmacion</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>¿Esta seguro de cancelar la revision?</Modal.Body>
+              <Modal.Footer>
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    setIsOpen(!modalIsOpen);
+                  }}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    setIsOpen(!modalIsOpen);
+                    navigate("/reportes");
+                  }}
+                >
+                  Confirmar
+                </Button>
+              </Modal.Footer>
+            </Modal>
 
-        <Modal style={{ color: "black" }} show={modalIsOpenAceptar}>
-          <Modal.Header>
-            <Modal.Title>Confirmacion</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>¿Esta seguro de aceptar el reporte?</Modal.Body>
-          <Modal.Footer>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                setIsOpenAceptar(!modalIsOpenAceptar);
-              }}
-            >
-              Cancelar
-            </Button>
-            <Button
-              variant="primary"
-              onClick={() => {
-                setIsOpenAceptar(!modalIsOpenAceptar);
-                AceptarReporte(reporte);
-              }}
-            >
-              Confirmar
-            </Button>
-          </Modal.Footer>
-        </Modal>
+            <Modal style={{ color: "black" }} show={modalIsOpenAceptar}>
+              <Modal.Header>
+                <Modal.Title>Confirmacion</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>¿Esta seguro de aceptar el reporte?</Modal.Body>
+              <Modal.Footer>
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    setIsOpenAceptar(!modalIsOpenAceptar);
+                  }}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    setIsOpenAceptar(!modalIsOpenAceptar);
+                    AceptarReporte(reporte);
+                  }}
+                >
+                  Confirmar
+                </Button>
+              </Modal.Footer>
+            </Modal>
 
-        <Modal style={{ color: "black" }} show={modalIsOpenRechazar}>
-          <Modal.Header>
-            <Modal.Title>Confirmacion</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>¿Esta seguro de rechazar el reporte?</Modal.Body>
-          <Modal.Footer>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                setIsOpenRechazar(!modalIsOpenRechazar);
-              }}
-            >
-              Cancelar
-            </Button>
-            <Button
-              variant="primary"
-              onClick={() => {
-                setIsOpenRechazar(!modalIsOpenRechazar);
-                denegarReporte();
-              }}
-            >
-              Confirmar
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      </div>
+            <Modal style={{ color: "black" }} show={modalIsOpenRechazar}>
+              <Modal.Header>
+                <Modal.Title>Confirmacion</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>¿Esta seguro de rechazar el reporte?</Modal.Body>
+              <Modal.Footer>
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    setIsOpenRechazar(!modalIsOpenRechazar);
+                  }}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    setIsOpenRechazar(!modalIsOpenRechazar);
+                    denegarReporte();
+                  }}
+                >
+                  Confirmar
+                </Button>
+              </Modal.Footer>
+            </Modal>
+          </div>
+        </>
+      ) : (
+        <>
+          <NavBarAdmin />
+          <SinAcceso />
+        </>
+      )}
 
       <link
         rel="stylesheet"

@@ -5,10 +5,11 @@ import NavBarAdmin from "../components/NavBarAdmin";
 import NavBarSupervisor from "../components/NavBarSupervisor";
 import { useNavigate } from "react-router-dom";
 import FiltroGlobal from "../components/FiltroGlobal";
+import SinAcceso from "../components/SinAcceso";
 
 function Reportes() {
   const navigate = useNavigate();
-  let tipoUsuario = localStorage.getItem("idtipousuario");
+  let tipoUsuario = sessionStorage.getItem("idtipousuario");
   const [reportes, setReportes] = useState([]);
   const columns = useMemo(
     () => [
@@ -41,6 +42,7 @@ function Reportes() {
         Cell: ({ cell }) => (
           <button
             className="btn btn-primary"
+            title="Revisar"
             onClick={() =>
               navigate("/revisionReportes?id=" + cell.row.values.idreporte)
             }
@@ -86,126 +88,133 @@ function Reportes() {
 
   return (
     <>
-      {tipoUsuario === "1" ? <NavBarSupervisor /> : <NavBarAdmin />}
-      <div className="reports">
-        <div
-          className="container-fluid table-responsive"
-        >
-          <h1>Reportes</h1>
-          <div className="d-flex justify-content-center mx-3">
-          <FiltroGlobal filter={globalFilter} setFilter={setGlobalFilter} />
-          </div>
-          <div
-            className="container-fluid btn-group mb-2"
-            role="group"
-            aria-label="Basic checkbox toggle button group"
-          >
-            <input
-              type="checkbox"
-              className="btn-check"
-              id="btncheck1"
-              autoComplete="off"
-              onClick={(e) => {
-                if (e.target.checked === true) {
-                  setGlobalFilter("Aceptado");
-                } else {
-                  setGlobalFilter("");
-                }
-              }}
-            />
-            <label className="btn btn-dark" htmlFor="btncheck1">
-              Reportes aceptados
-            </label>
-
-            <input
-              type="checkbox"
-              className="btn-check"
-              id="btncheck2"
-              autoComplete="off"
-              onClick={(e) => {
-                if (e.target.checked === true) {
-                  setGlobalFilter("Rechazado");
-                } else {
-                  setGlobalFilter("");
-                }
-              }}
-            />
-            <label className="btn btn-dark" htmlFor="btncheck2">
-              Reportes rechazados
-            </label>
-
-            <input
-              type="checkbox"
-              className="btn-check"
-              id="btncheck3"
-              autoComplete="off"
-              onClick={(e) => {
-                if (e.target.checked === true) {
-                  setGlobalFilter("Revision");
-                } else {
-                  setGlobalFilter("");
-                }
-              }}
-            />
-            <label className="btn btn-dark" htmlFor="btncheck3">
-              Reportes en revisión
-            </label>
-          </div>
-          <table className="table-dark " {...getTableProps()}>
-            <thead>
-              {
-                // Loop over the header rows
-                headerGroups.map((headerGroup) => (
-                  // Apply the header row props
-                  <tr {...headerGroup.getHeaderGroupProps()}>
-                    {
-                      // Loop over the headers in each row
-                      headerGroup.headers.map((column) => (
-                        // Apply the header cell props
-                        <th className="table-dark" {...column.getHeaderProps()}>
-                          {
-                            // Render the header
-                            column.render("Header")
-                          }
-                        </th>
-                      ))
+      {tipoUsuario === "1" ? (
+        <>
+          <NavBarSupervisor />{" "}
+          <div className="reports text-center">
+            <div className="container-fluid table-responsive">
+              <h1>Reportes</h1>
+              <div className="d-flex justify-content-center mx-3">
+                <FiltroGlobal
+                  filter={globalFilter}
+                  setFilter={setGlobalFilter}
+                />
+              </div>
+              <div
+                className="container-fluid btn-group mb-2"
+                role="group"
+                aria-label="Basic checkbox toggle button group"
+              >
+                <input
+                  type="checkbox"
+                  className="btn-check"
+                  id="btncheck1"
+                  autoComplete="off"
+                  onClick={(e) => {
+                    if (e.target.checked === true) {
+                      setGlobalFilter("Aceptado");
+                    } else {
+                      setGlobalFilter("");
                     }
-                  </tr>
-                ))
-              }
-            </thead>
-            {/* Apply the table body props */}
-            <tbody {...getTableBodyProps()}>
-              {
-                // Loop over the table rows
-                page.map((row) => {
-                  // Prepare the row for display
-                  prepareRow(row);
-                  return (
-                    // Apply the row props
-                    <tr {...row.getRowProps()}>
-                      {
-                        // Loop over the rows cells
-                        row.cells.map((cell) => {
-                          // Apply the cell props
-                          return (
-                            <td {...cell.getCellProps()}>
+                  }}
+                />
+                <label className="btn btn-dark" htmlFor="btncheck1">
+                  Reportes aceptados
+                </label>
+
+                <input
+                  type="checkbox"
+                  className="btn-check"
+                  id="btncheck2"
+                  autoComplete="off"
+                  onClick={(e) => {
+                    if (e.target.checked === true) {
+                      setGlobalFilter("Rechazado");
+                    } else {
+                      setGlobalFilter("");
+                    }
+                  }}
+                />
+                <label className="btn btn-dark" htmlFor="btncheck2">
+                  Reportes rechazados
+                </label>
+
+                <input
+                  type="checkbox"
+                  className="btn-check"
+                  id="btncheck3"
+                  autoComplete="off"
+                  onClick={(e) => {
+                    if (e.target.checked === true) {
+                      setGlobalFilter("Revision");
+                    } else {
+                      setGlobalFilter("");
+                    }
+                  }}
+                />
+                <label className="btn btn-dark" htmlFor="btncheck3">
+                  Reportes en revisión
+                </label>
+              </div>
+              <table className="table-dark " {...getTableProps()}>
+                <thead>
+                  {
+                    // Loop over the header rows
+                    headerGroups.map((headerGroup) => (
+                      // Apply the header row props
+                      <tr {...headerGroup.getHeaderGroupProps()}>
+                        {
+                          // Loop over the headers in each row
+                          headerGroup.headers.map((column) => (
+                            // Apply the header cell props
+                            <th
+                              className="table-dark"
+                              {...column.getHeaderProps()}
+                            >
                               {
-                                // Render the cell contents
-                                cell.render("Cell")
+                                // Render the header
+                                column.render("Header")
                               }
-                            </td>
-                          );
-                        })
-                      }
-                    </tr>
-                  );
-                })
-              }
-            </tbody>
-          </table>
-          <div className="container mt-2 text-center justify-content-end fs-5">
-            <div className="container row">
+                            </th>
+                          ))
+                        }
+                      </tr>
+                    ))
+                  }
+                </thead>
+                {/* Apply the table body props */}
+                <tbody {...getTableBodyProps()}>
+                  {
+                    // Loop over the table rows
+                    page.map((row) => {
+                      // Prepare the row for display
+                      prepareRow(row);
+                      return (
+                        // Apply the row props
+                        <tr {...row.getRowProps()}>
+                          {
+                            // Loop over the rows cells
+                            row.cells.map((cell) => {
+                              // Apply the cell props
+                              return (
+                                <td {...cell.getCellProps()}>
+                                  {
+                                    // Render the cell contents
+                                    cell.render("Cell")
+                                  }
+                                </td>
+                              );
+                            })
+                          }
+                        </tr>
+                      );
+                    })
+                  }
+                </tbody>
+              </table>
+              <div className="container mt-2 text-center justify-content-end fs-5">
+                {/* Paginacion */}
+                {/* <div className="container row">
               <span>
                 Pagina{" "}
                 <strong>
@@ -232,10 +241,17 @@ function Reportes() {
               >
                 Siguiente
               </button>
+            </div> */}
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        </>
+      ) : (
+        <>
+          <NavBarAdmin />
+          <SinAcceso />
+        </>
+      )}
     </>
   );
 }

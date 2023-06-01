@@ -1,93 +1,130 @@
 body {
-    font-family: "Lato", sans-serif;
-	background-color: #021f54;
-	color: #f7f7f7;
+  font-family: "Lato", sans-serif;
+  background-color: #021f54;
+  color: #f7f7f7;
+}
+.loader {
+  width: 32px;
+  height: 32px;
+  position: relative;
+  border-radius: 50%;
+  color: #ffee00;
+  animation: fill 1s ease-in infinite alternate;
+}
+.loader::before , .loader::after {
+  content: '';
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  border-radius: 50%;
+  left: 48px;
+  top: 0;
+  animation: fill 0.9s ease-in infinite alternate;
 }
 
-.main-head{
-    height: 150px;
-    background: #021f54;
-   
+.loader::after {
+  left: auto;
+  right: 48px;
+  animation-duration: 1s;
+}
+
+@keyframes fill {
+ 0% {  box-shadow: 0 0 0 2px inset }
+ 100%{ box-shadow: 0 0 0 10px inset }
+}
+  
+.hijo{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 20%;
+}
+
+.main-head {
+  height: 150px;
+  background: #021f54;
 }
 
 .sidenav {
-    height: 100%;
-    background-color: #021f54;
-    overflow-x: hidden;
-    padding-top: 20px;
+  height: 100%;
+  background-color: #021f54;
+  overflow-x: hidden;
+  padding-top: 20px;
 }
 
 .main {
-    padding: 0px 10px;
-    position: relative;
-    top: -150px; left: 100px;
+  padding: 0px 10px;
+  position: relative;
+  top: -150px;
+  left: 100px;
 }
 
 @media screen and (max-height: 450px) {
-    .sidenav {padding-top: 15px;}
+  .sidenav {
+    padding-top: 15px;
+  }
 }
 
 @media screen and (max-width: 450px) {
-    .login-form{
-        margin-top: 10%;
-    }
+  .login-form {
+    margin-top: 10%;
+  }
 
-    .register-form{
-        margin-top: 10%;
-    }
+  .register-form {
+    margin-top: 10%;
+  }
 }
 
-@media screen and (min-width: 768px){
-    .main{
-        margin-left: 20%; 
-    }
+@media screen and (min-width: 768px) {
+  .main {
+    margin-left: 20%;
+  }
 
-    .sidenav{
-        width: 40%;
-        position: fixed;
-        z-index: -1;
-        top: 0;
-        left: 0;
-    }
+  .sidenav {
+    width: 40%;
+    position: fixed;
+    z-index: -1;
+    top: 0;
+    left: 0;
+  }
 
-    .login-form{
-        margin-top: 200px;
-    }
+  .login-form {
+    margin-top: 200px;
+  }
 
-    .register-form{
-        margin-top: 20%;
-    }
+  .register-form {
+    margin-top: 20%;
+  }
 }
 
-
-.login-main-text{
-    margin-top: 100px;
-    padding: 60px;
-    color: #fff;
+.login-main-text {
+  margin-top: 100px;
+  padding: 60px;
+  color: #fff;
 }
 
-.login-main-text h2{
-    font-weight: 300;
+.login-main-text h2 {
+  font-weight: 300;
 }
 
-.btn-black{
-    background-color: #ebebeb !important;
-    color: #000000;
-    }
-    
-    .icon-login>ion-icon {
-        color: #fefb64;
-        font-size: 200px;
-    }
-    
-    .label-login {
-        font-size: 40px;
-        position: relative;
-        top: 200px;
-        left: 40px;
-    }
-    
-    .suci-fondo {
-        background-color: #021f54;
-        color: #f7f7f7;
-    }
+.btn-black {
+  background-color: #ebebeb !important;
+  color: #000000;
+}
+
+.icon-login > ion-icon {
+  color: #fefb64;
+  font-size: 200px;
+}
+
+.label-login {
+  font-size: 40px;
+  position: relative;
+  top: 200px;
+  left: 40px;
+}
+
+.suci-fondo {
+  background-color: #021f54;
+  color: #f7f7f7;
+}

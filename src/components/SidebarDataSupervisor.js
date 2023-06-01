@@ -21,9 +21,15 @@ export const SidebarDataSupervisor = [
     cName: "nav-text",
   },
   {
-    title: "Posibles Usuarios",
+    title: "Alta de usuarios",
     path: "/posiblesUsuarios",
     icons: <ion-icon name="person-add"></ion-icon>,
+    cName: "nav-text",
+  },
+  {
+    title: "Multas",
+    path: "/multas",
+    icons: <ion-icon name="clipboard"></ion-icon>,
     cName: "nav-text",
   },
   {
