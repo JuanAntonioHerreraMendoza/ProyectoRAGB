@@ -5,8 +5,27 @@ import "../assets/Login.css";
 import { login } from "../services/UsuarioService";
 //libreria
 import { useNavigate } from "react-router-dom";
+import { Button, Modal } from "react-bootstrap";
+import {
+  cambiarContraseña,
+  enviarCodigo,
+  existeCodigo,
+  existeUsuario,
+} from "../services/ApiRest";
+import { validarContraseña } from "../services/Validaciones";
 
 function Login() {
+  const [modal, setModalOpen] = useState(false);
+  const [modalContraseña, setModalContraseña] = useState(false);
+  const [modalCambioContraseña, setmodalCambioContraseña] = useState(false);
+  const [modalConfirmacion, setModalConfirmacion] = useState(false);
+  const [inputsVacios, setInputsVacios] = useState(false);
+  const [codigoAlerta, setCodigoAlerta] = useState(false);
+  const [alerta, setAlerta] = useState(false);
+  const [mensajeError, setMensajeError] = useState("");
+  const [codigo, setCodigo] = useState("");
+  const [correo, setCorreo] = useState("");
+  const [contraseña, setContraseña] = useState("");
   const [usuario, setusuario] = useState({
     usuario: "",
     contraseña: "",
@@ -22,9 +41,18 @@ function Login() {
   const navigate = useNavigate();
 
   const mandejadorSubmit = (e) => {
+    setInputsVacios(false);
     e.preventDefault();
-    manejadorBoton();
-    setloading(true);
+    if (usuario.usuario !== "" && usuario.contraseña !== "") {
+      //enviarCodigoUsuario(usuario.usuario);
+      setModalOpen(true);
+    } else {
+      setInputsVacios(true);
+    }
+  };
+
+  const enviarCodigoUsuario = async (correo) => {
+    await enviarCodigo(correo);
   };
 
   const manejadorChange = (e) => {
@@ -50,7 +78,7 @@ function Login() {
           response.data.tipousuariofk.idtipousuario
         );
         setloading(false);
-        navigate("/home",{state:{logeado:true}});
+        navigate("/home", { state: { logeado: true } });
       } else {
         seterror({
           error: true,
@@ -79,6 +107,24 @@ function Login() {
     }
   };
 
+  const manejadorContraseña = (codigo, contraseña) => {
+    console.log(codigo+" "+contraseña)
+    let checkPass = validarContraseña(contraseña);
+    if (checkPass) {
+      setAlerta(true);
+      setMensajeError(checkPass);
+      return;
+    }
+    cambiarContraseña(codigo, contraseña).then((res) => {
+      if (!res) {
+        setMensajeError("El codigo no coincide");
+        setAlerta(true);
+      } else {
+        setmodalCambioContraseña(false);
+      }
+    });
+  };
+
   return (
     <>
       {loading ? (
@@ -98,6 +144,13 @@ function Login() {
             </div>
             <div className="col">
               <div className="login-form">
+                {inputsVacios ? (
+                  <div className="alert alert-danger" role="alert">
+                    Rellene todos los campos correctamente
+                  </div>
+                ) : (
+                  <></>
+                )}
                 <form
                   onSubmit={(event) => {
                     mandejadorSubmit(event);
@@ -137,13 +190,210 @@ function Login() {
                 </form>
                 <div>
                   <br />
-                  <a className="suci-fondo" href="###">
-                    ¿Olvidaste la contraseña?
-                  </a>
+                  <button
+                    className="btn link-secondary"
+                    onClick={() => {
+                      setModalContraseña(true);
+                    }}
+                  >
+                    ¿Olvidaste tu contraseña?
+                  </button>
                 </div>
               </div>
             </div>
           </div>
+          <Modal style={{ color: "black" }} show={modal}>
+            <Modal.Header>
+              <Modal.Title>Codigo de confirmacion</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              {codigoAlerta ? (
+                <div className="alert alert-danger" role="alert">
+                  No existe el codigo que escribiste
+                </div>
+              ) : (
+                <></>
+              )}
+              Ingrese el codigo que se la enviado a su correo para iniciar
+              sesion:
+              <div className="input-group input-group-sm my-3">
+                <input
+                  type="text"
+                  className="form-control"
+                  aria-label="Sizing example input"
+                  aria-describedby="inputGroup-sizing-sm"
+                  placeholder="Escriba el codigo que se le envio..."
+                  value={codigo}
+                  onChange={(e) => {
+                    setCodigo(e.target.value.toUpperCase());
+                  }}
+                  maxLength={6}
+                />
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setModalOpen(!modal);
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="primary"
+                onClick={() => {
+                  existeCodigo(codigo).then((res) => {
+                    if (res) {
+                      setModalOpen(false);
+                      manejadorBoton();
+                    } else {
+                      setCodigoAlerta(true);
+                    }
+                  });
+                }}
+              >
+                Confirmar
+              </Button>
+            </Modal.Footer>
+          </Modal>
+
+          <Modal style={{ color: "black" }} show={modalContraseña}>
+            <Modal.Header>
+              <Modal.Title>Cambio de contraseña</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              Ingrese su usuario para enviarle un codigo para recuperar su
+              contraseña:
+              <div className="input-group input-group-sm my-3">
+                <input
+                  type="email"
+                  required
+                  className="form-control"
+                  aria-label="Sizing example input"
+                  aria-describedby="inputGroup-sizing-sm"
+                  placeholder="Escriba su usuario..."
+                  onChange={(e) => {
+                    setCorreo(e.target.value);
+                  }}
+                />
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setModalContraseña(false);
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="primary"
+                onClick={() => {
+                  existeUsuario(correo).then((res) => {
+                    if (res) {
+                      //enviarCodigoUsuario(correo)
+                      setModalContraseña(false);
+                      setmodalCambioContraseña(true);
+                    }
+                  });
+                }}
+              >
+                Confirmar
+              </Button>
+            </Modal.Footer>
+          </Modal>
+
+          <Modal style={{ color: "black" }} show={modalCambioContraseña}>
+            <Modal.Header>
+              <Modal.Title>Codigo de confirmacion</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              {alerta ? (
+                <div className="alert alert-danger" role="alert">
+                  {mensajeError}
+                </div>
+              ) : (
+                <></>
+              )}
+              Ingrese el codigo que se la enviado a su correo para cambiar su
+              contraseña
+              <div className="input-group input-group-sm my-3">
+                <input
+                  type="text"
+                  className="form-control"
+                  aria-label="Sizing example input"
+                  aria-describedby="inputGroup-sizing-sm"
+                  placeholder="Escriba el codigo que se le envio..."
+                  value={codigo}
+                  onChange={(e) => {
+                    setCodigo(e.target.value.toUpperCase());
+                  }}
+                  maxLength={6}
+                />
+              </div>
+              <div className="input-group input-group-sm my-3">
+                <input
+                  type="text"
+                  className="form-control"
+                  aria-label="Sizing example input"
+                  aria-describedby="inputGroup-sizing-sm"
+                  placeholder="Escriba su nueva contraseña..."
+                  onChange={(e) => {
+                    setContraseña(e.target.value);
+                  }}
+                />
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setAlerta(false);
+                  setMensajeError("");
+                  setCodigo("")
+                  setmodalCambioContraseña(!modalCambioContraseña);
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="primary"
+                onClick={() => {
+                  setModalConfirmacion(true);
+                }}
+              >
+                Confirmar
+              </Button>
+            </Modal.Footer>
+          </Modal>
+
+          <Modal style={{ color: "black" }} show={modalConfirmacion}>
+            <Modal.Header>
+              <Modal.Title>Confirmacion</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>¿Esta seguro de cambiar su contraseña?</Modal.Body>
+            <Modal.Footer>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setModalConfirmacion(false);
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="primary"
+                onClick={() => {
+                  manejadorContraseña(codigo, contraseña);
+                  setModalConfirmacion(false);
+                }}
+              >
+                Confirmar
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </div>
       )}
     </>

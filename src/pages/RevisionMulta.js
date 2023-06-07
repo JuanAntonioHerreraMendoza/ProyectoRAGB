@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { getMulta, pagarMulta } from "../services/ApiRest";
+import {
+  enviarCorreoMulta,
+  enviarNotificacionMulta,
+  enviarNotificacionR,
+  getMulta,
+  pagarMulta,
+} from "../services/ApiRest";
 import { useLocation, useNavigate } from "react-router-dom";
 import NavBarSupervisor from "../components/NavBarSupervisor";
 import NavBarAdmin from "../components/NavBarAdmin";
@@ -19,7 +25,15 @@ function RevisionMulta() {
   };
 
   const cobroMulta = async (multa) => {
-    await pagarMulta(multa).catch((error) => alert(error));
+    await pagarMulta(multa)
+      .then(() => {
+        enviarCorreoMulta(multa.idreportadorfk.correo)
+          .then(
+            enviarNotificacionMulta("ExponentPushToken[wg6ucrGk7QmGEUntUUBuNR]")
+          )
+          .catch((error) => alert(error));
+      })
+      .catch((error) => alert(error));
   };
 
   useEffect(() => {
@@ -27,7 +41,7 @@ function RevisionMulta() {
     obtenerMulta(query.get("id"))
       .then((data) => {
         setMulta(data);
-        console.log(multa);
+        console.log(data);
       })
       .catch((error) => alert(error));
   }, []);
@@ -304,7 +318,7 @@ function RevisionMulta() {
       ) : (
         <>
           <NavBarAdmin />
-          <SinAcceso/>
+          <SinAcceso />
         </>
       )}
     </>

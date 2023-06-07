@@ -123,11 +123,9 @@ export const suspenderUsuario = async (usuario, fecha) => {
 
 export const eliminarUsuario = async (usuario) => {
   let res = "";
-  await axios
-    .put(Apiurl + "usuarios/eliminar",usuario)
-    .then((response) => {
-      res = response.status;
-    });
+  await axios.put(Apiurl + "usuarios/eliminar", usuario).then((response) => {
+    res = response.status;
+  });
   return res;
 };
 
@@ -141,6 +139,16 @@ export const enviarCorreoReporte = async (usuario, resultado) => {
         "&resultado=" +
         resultado
     )
+    .then((response) => {
+      res = response.status;
+    });
+  console.log(res);
+};
+
+export const enviarCorreoMulta = async (usuario) => {
+  let res = "";
+  await axios
+    .post(Apiurl + "correo/correoMulta?correo=" + usuario)
     .then((response) => {
       res = response.status;
     });
@@ -163,7 +171,21 @@ export const enviarCorreoUsuarioPosible = async (usuario, resultado) => {
   console.log(res);
 };
 
-export const enviarNotificacion = async (token, estatus) => {
+export const enviarNotificacionMulta= async (token) => {
+  let res = "";
+  let notificacion = {
+    token: token,
+    titulo: "Revision de multa",
+    mensaje: "Una multa fue pagada",
+    data: {},
+  };
+  await axios.post(Apiurl + "notificacion", notificacion).then((response) => {
+    res = response.status;
+  });
+  return res;
+};
+
+export const enviarNotificacionR = async (token, estatus) => {
   let res = "";
   let notificacion = {
     token: token,
@@ -218,6 +240,22 @@ export const getMulta = async (id) => {
 export const pagarMulta = async (multa) => {
   let res = {};
   await axios.put(Apiurl + "multas", multa).then((response) => {
+    res = response.data;
+  });
+  return res;
+};
+
+export const existeCodigo = async (codigo) => {
+  let res = false;
+  await axios.post(Apiurl + "codigo", {codigo:codigo}).then((response) => {
+    res = response.data;
+  });
+  return res;
+};
+
+export const existeUsuario = async (correo) => {
+  let res = {};
+  await axios.get(Apiurl + "usuarios/existeUsuario?correo=" + correo).then((response) => {
     res = response.data;
   });
   return res;

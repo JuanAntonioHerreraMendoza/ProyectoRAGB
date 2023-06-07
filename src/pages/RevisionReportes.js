@@ -5,7 +5,7 @@ import NavBarSupervisor from "../components/NavBarSupervisor";
 import {
   cambiarEstatus,
   enviarCorreoReporte,
-  enviarNotificacion,
+  enviarNotificacionR,
   getConductorInfo,
   getReporte,
   nuevaMulta,
@@ -69,7 +69,7 @@ function RevisionReportes() {
         alert(error);
         return;
       });
-    enviarNotificacion("ExponentPushToken[wg6ucrGk7QmGEUntUUBuNR]", false);
+    enviarNotificacionR("ExponentPushToken[wg6ucrGk7QmGEUntUUBuNR]", false);
     navigate("/reportes");
   };
   const AceptarReporte = async (reporte) => {
@@ -93,7 +93,7 @@ function RevisionReportes() {
       )
       .catch((error) => console.error(error));
     await enviarCorreoReporte(reporte.idreportadorfk.correo, true);
-    await enviarNotificacion("ExponentPushToken[wg6ucrGk7QmGEUntUUBuNR]", true);
+    await enviarNotificacionR("ExponentPushToken[wg6ucrGk7QmGEUntUUBuNR]", true);
     navigate("/reportes");
   };
 

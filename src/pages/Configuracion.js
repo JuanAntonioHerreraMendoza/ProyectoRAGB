@@ -66,17 +66,17 @@ function Configuracion() {
                 <div class="container input-group mb-3">
                   <input
                     type="text"
-                    class="form-control"
+                    className="form-control"
                     placeholder="Codigo"
                     aria-label="Codigo"
                     aria-describedby="basic-addon1"
                     onChange={(e) => setCodigo(e.target.value)}
                   />
                 </div>
-                <div class="container input-group mb-3">
+                <div className="container input-group mb-3">
                   <input
                     type="password"
-                    class="form-control"
+                    className="form-control"
                     placeholder="Contraseña"
                     aria-label="Contraseña"
                     aria-describedby="basic-addon1"
@@ -98,7 +98,10 @@ function Configuracion() {
           </li>
           <button
             className="btn btn-secondary my-2"
-            onClick={() => {sessionStorage.clear();navigate("../")}}
+            onClick={() => {
+              sessionStorage.clear();
+              navigate("../");
+            }}
           >
             Cerrar sesión
           </button>
