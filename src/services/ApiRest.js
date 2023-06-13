@@ -260,3 +260,11 @@ export const existeUsuario = async (correo) => {
   });
   return res;
 };
+
+export const getConductor = async (persona) => {
+  let res = {};
+  await axios.get(Apiurl + "conductores/getConductor",persona).then((response) => {
+    res = response.data;
+  });
+  return res;
+};

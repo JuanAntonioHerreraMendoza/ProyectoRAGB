@@ -40,6 +40,7 @@ function PosiblesUsuarios() {
           <div>
             <button
               className="btn btn-primary"
+              title="Revisar"
               onClick={() => {
                 navigate(
                   "/revisionUsuarios?id=" + cell.row.values.idposibleusuario

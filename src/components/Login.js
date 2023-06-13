@@ -63,6 +63,7 @@ function Login() {
   };
 
   const manejadorBoton = async () => {
+    setloading(true);
     let response = await login(usuario);
     if (response.status === 200) {
       sessionStorage.setItem("userInfo", JSON.stringify(response.data));
@@ -108,7 +109,7 @@ function Login() {
   };
 
   const manejadorContraseña = (codigo, contraseña) => {
-    console.log(codigo+" "+contraseña)
+    console.log(codigo + " " + contraseña);
     let checkPass = validarContraseña(contraseña);
     if (checkPass) {
       setAlerta(true);
@@ -352,7 +353,7 @@ function Login() {
                 onClick={() => {
                   setAlerta(false);
                   setMensajeError("");
-                  setCodigo("")
+                  setCodigo("");
                   setmodalCambioContraseña(!modalCambioContraseña);
                 }}
               >

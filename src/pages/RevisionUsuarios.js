@@ -6,10 +6,14 @@ import {
   aceptarUsuarioPosible,
   deleteUsuarioPosible,
   enviarCorreoUsuarioPosible,
+  getConductor,
+  getConductorInfo,
   getUsuarioPosible,
 } from "../services/ApiRest";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button, Carousel, Modal } from "react-bootstrap";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
 function RevisionUsuarios() {
   let tipoUsuario = sessionStorage.getItem("idtipousuario");
@@ -38,10 +42,12 @@ function RevisionUsuarios() {
     correo: "",
     tipousuariofk: {},
   });
+  const [conductor, setConductor] = useState({});
   const [modalIsOpen, setIsOpen] = useState(false);
   const [modalIsOpenAceptar, setIsOpenAceptar] = useState(false);
   const [modalIsOpenRechazar, setIsOpenRechazar] = useState(false);
   let { search } = useLocation();
+  const MySwal = withReactContent(Swal);
 
   const obtenerUsuario = async (id) => {
     return await getUsuarioPosible(id);
@@ -72,10 +78,36 @@ function RevisionUsuarios() {
     );
   };
 
+  function alerta(resolucion) {
+    if (resolucion) {
+      MySwal.fire({
+        icon: "success",
+        title: <p>Se ha autorizado con exito al usuario</p>,
+      }).then(() => {
+        navigate("/posiblesUsuarios");
+      });
+    } else {
+      MySwal.fire({
+        icon: "error",
+        title: <p>Se ha rechazado con exito al usuario</p>,
+      }).then(() => {
+        denegarUsuario(usuarioPosible.idposibleusuario, usuarioPosible.correo);
+        navigate("/posiblesUsuarios");
+      });
+    }
+  }
+
   useEffect(() => {
     let query = new URLSearchParams(search);
     obtenerUsuario(query.get("id"))
-      .then((data) => setUsuarioPosible(data))
+      .then((data) => {
+        setUsuarioPosible(data);
+        if (data.tipousuariofk.idtipousuario === 2) {
+          getConductorInfo(data.datoconductor, data.datoconductor, "").then(
+            (res) => setConductor(res)
+          );
+        }
+      })
       .catch((e) => console.error(e));
   }, []);
 
@@ -86,10 +118,11 @@ function RevisionUsuarios() {
           <NavBarSupervisor />
           <div className="container">
             <div className="container text-center">
+              <h3>Datos de conductor</h3>
               <div className="col">
                 <ul className="list-group mt-4">
                   <li className="list-group-item list-group-item-dark">
-                    Fecha
+                    Imagenes
                   </li>
                   <li className="list-group-item list-group-item-secondary">
                     <Carousel>
@@ -224,6 +257,69 @@ function RevisionUsuarios() {
                   </div>
                 </div>
               </div>
+              {usuarioPosible.tipousuariofk?.idtipousuario === 2 ? (
+                <div className="row align-items-start">
+                  <h3>Datos de conductor</h3>
+                  <div className="col">
+                    <div className="container text-center">
+                      <ul className="list-group mt-4">
+                        <li className="list-group-item list-group-item-dark">
+                          Licencia
+                        </li>
+                        <li className="list-group-item list-group-item-secondary">
+                          {conductor.noLicencia}
+                        </li>
+                      </ul>
+                      <ul className="list-group mt-4">
+                        <li className="list-group-item list-group-item-dark">
+                          Placas
+                        </li>
+                        <li className="list-group-item list-group-item-secondary">
+                          {conductor.numplacas}
+                        </li>
+                      </ul>
+                      <ul className="list-group mt-4">
+                        <li className="list-group-item list-group-item-dark">
+                          Tarjeta de circulacion
+                        </li>
+                        <li className="list-group-item list-group-item-secondary">
+                          {conductor.tarjetaCirculacion}
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div className="col">
+                    <div className="container text-center">
+                      <ul className="list-group mt-4">
+                        <li className="list-group-item list-group-item-dark">
+                          Tipo de licencia
+                        </li>
+                        <li className="list-group-item list-group-item-secondary">
+                          {conductor.tipoLicencia}
+                        </li>
+                      </ul>
+                      <ul className="list-group mt-4">
+                        <li className="list-group-item list-group-item-dark">
+                          Vigencia de licencia
+                        </li>
+                        <li className="list-group-item list-group-item-secondary">
+                          {conductor.vigLicencia}
+                        </li>
+                      </ul>
+                      <ul className="list-group mt-4">
+                        <li className="list-group-item list-group-item-dark">
+                          Vigencia de tenencia
+                        </li>
+                        <li className="list-group-item list-group-item-secondary">
+                          {conductor.vigTenencia}
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <></>
+              )}
               <div className="my-3">
                 <label
                   htmlFor="exampleFormControlTextarea1"
@@ -304,9 +400,7 @@ function RevisionUsuarios() {
                   variant="primary"
                   onClick={() => {
                     setIsOpenAceptar(!modalIsOpenAceptar);
-                    aceptarUsuario(usuarioPosible).then(
-                      navigate("/posiblesUsuarios")
-                    );
+                    aceptarUsuario(usuarioPosible).then(alerta(true));
                   }}
                 >
                   Confirmar
@@ -332,11 +426,7 @@ function RevisionUsuarios() {
                   variant="primary"
                   onClick={() => {
                     setIsOpenRechazar(!modalIsOpenRechazar);
-                    denegarUsuario(
-                      usuarioPosible.idposibleusuario,
-                      usuarioPosible.correo
-                    );
-                    navigate("/posiblesUsuarios");
+                    alerta(false);
                   }}
                 >
                   Confirmar

@@ -12,9 +12,12 @@ import {
 } from "../services/ApiRest";
 import { MapContainer, Marker, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import ReactPanZoom from "react-image-pan-zoom-rotate";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import SinAcceso from "../components/SinAcceso";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
 function RevisionReportes() {
   const navigate = useNavigate();
@@ -43,6 +46,25 @@ function RevisionReportes() {
     reportefk: { idreporte: "" },
     personal: { idpersonal: "" },
   });
+  const MySwal = withReactContent(Swal);
+
+  function showAlerta(resolucion, reporte) {
+    if (resolucion) {
+      MySwal.fire({
+        icon: "success",
+        title: <p>Se ha aceptado el reporte y se generara la multa</p>,
+      }).then(() => {
+        AceptarReporte(reporte);
+      });
+    } else {
+      MySwal.fire({
+        icon: "error",
+        title: <p>Se ha rechazado el reporte con exito</p>,
+      }).then(() => {
+        denegarReporte();
+      });
+    }
+  }
 
   const obtenerReporte = async (id) => {
     return await getReporte(id);
@@ -60,9 +82,6 @@ function RevisionReportes() {
     });
   };
   const denegarReporte = () => {
-    if (datoConductor === "" || multa.monto === "" || multa.razon === "") {
-      return setAlerta(true);
-    }
     cambiarEstatus(reporte.idreporte, "Rechazado")
       .then(enviarCorreoReporte(reporte.idreportadorfk.correo, false))
       .catch((error) => {
@@ -93,7 +112,10 @@ function RevisionReportes() {
       )
       .catch((error) => console.error(error));
     await enviarCorreoReporte(reporte.idreportadorfk.correo, true);
-    await enviarNotificacionR("ExponentPushToken[wg6ucrGk7QmGEUntUUBuNR]", true);
+    await enviarNotificacionR(
+      "ExponentPushToken[wg6ucrGk7QmGEUntUUBuNR]",
+      true
+    );
     navigate("/reportes");
   };
 
@@ -167,8 +189,15 @@ function RevisionReportes() {
                           />
                         </div>
                       ) : (
-                        <div>
-                          <img
+                        <div
+                          style={{
+                            width: 450,
+                            height: 350,
+                            overflow: "hidden",
+                            position: "relative",
+                          }}
+                        >
+                          {/* <img
                             style={{ width: 400, height: 340 }}
                             src={
                               "http://192.168.1.75:8080/images/" +
@@ -183,6 +212,14 @@ function RevisionReportes() {
                                   "?path=reportes"
                               );
                             }}
+                          /> */}
+                          <ReactPanZoom
+                            image={
+                              "http://192.168.1.75:8080/images/" +
+                              archivo +
+                              "?path=reportes"
+                            }
+                            alt="Image alt text"
                           />
                         </div>
                       )}
@@ -256,11 +293,12 @@ function RevisionReportes() {
                     <select
                       className="form-select"
                       aria-label="Default select example"
+                      name="monto"
                       onChange={(e) => {
                         manejadorChange(e);
                       }}
                     >
-                      <option defaultValue={"0"}>Seleccionar infraccion</option>
+                      <option defaultValue="0">Seleccionar infraccion</option>
                       <option value="1000">Mal estacionado</option>
                       <option value="2000">Pasarse un alto</option>
                       <option value="3000">Auto sin luces</option>
@@ -369,8 +407,7 @@ function RevisionReportes() {
                 <Button
                   variant="primary"
                   onClick={() => {
-                    setIsOpenAceptar(!modalIsOpenAceptar);
-                    AceptarReporte(reporte);
+                    showAlerta(true, reporte);
                   }}
                 >
                   Confirmar
@@ -396,7 +433,7 @@ function RevisionReportes() {
                   variant="primary"
                   onClick={() => {
                     setIsOpenRechazar(!modalIsOpenRechazar);
-                    denegarReporte();
+                    showAlerta(false);
                   }}
                 >
                   Confirmar
