@@ -9,6 +9,7 @@ import {
   getConductor,
   getConductorInfo,
   getUsuarioPosible,
+  vincularConductorPersona,
 } from "../services/ApiRest";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button, Carousel, Modal } from "react-bootstrap";
@@ -73,9 +74,10 @@ function RevisionUsuarios() {
     usuario.contraseña = usuarioP.contraseña;
     usuario.idpersonafk = persona;
 
-    await aceptarUsuarioPosible(usuario).then(
-      enviarCorreoUsuarioPosible(usuarioP.correo, true)
-    );
+    await aceptarUsuarioPosible(usuario).then((res) => {
+      enviarCorreoUsuarioPosible(usuarioP.correo, true);
+      vincularConductorPersona(conductor, res);
+    });
   };
 
   function alerta(resolucion) {
@@ -84,6 +86,7 @@ function RevisionUsuarios() {
         icon: "success",
         title: <p>Se ha autorizado con exito al usuario</p>,
       }).then(() => {
+        deleteUsuarioPosible(usuarioPosible.idposibleusuario);
         navigate("/posiblesUsuarios");
       });
     } else {
@@ -400,7 +403,9 @@ function RevisionUsuarios() {
                   variant="primary"
                   onClick={() => {
                     setIsOpenAceptar(!modalIsOpenAceptar);
-                    aceptarUsuario(usuarioPosible).then(alerta(true));
+                    aceptarUsuario(usuarioPosible)
+                      .then(alerta(true))
+                      .catch((e) => alert(e));
                   }}
                 >
                   Confirmar

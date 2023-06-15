@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { createRef, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import NavBarAdmin from "../components/NavBarAdmin";
 import NavBarSupervisor from "../components/NavBarSupervisor";
@@ -22,6 +22,7 @@ import withReactContent from "sweetalert2-react-content";
 function RevisionReportes() {
   const navigate = useNavigate();
   let tipoUsuario = sessionStorage.getItem("idtipousuario");
+  const ref = createRef();
 
   const [alerta, setAlerta] = useState(false);
   const [modalIsOpen, setIsOpen] = useState(false);
@@ -112,10 +113,7 @@ function RevisionReportes() {
       )
       .catch((error) => console.error(error));
     await enviarCorreoReporte(reporte.idreportadorfk.correo, true);
-    await enviarNotificacionR(
-      "ExponentPushToken[wg6ucrGk7QmGEUntUUBuNR]",
-      true
-    );
+    await enviarNotificacionR(reporte.idreportadorfk.correo, true);
     navigate("/reportes");
   };
 
@@ -132,7 +130,7 @@ function RevisionReportes() {
     <>
       {tipoUsuario === "1" ? (
         <>
-          <NavBarSupervisor />{" "}
+          <NavBarSupervisor />
           <div className="container">
             <div className="container text-center">
               <div className="row align-items-start">
@@ -153,6 +151,8 @@ function RevisionReportes() {
                       {reporte.direccion}
                     </li>
                   </ul>
+                </div>
+                <div className="col">
                   <ul className="list-group mt-4">
                     <li className="list-group-item list-group-item-dark">
                       Razon
@@ -170,6 +170,10 @@ function RevisionReportes() {
                     </li>
                   </ul>
                 </div>
+              </div>
+            </div>
+            <div className="container text-center ">
+              <div className="row align-items-center">
                 <div className="col">
                   <ul className="list-group mt-4">
                     <li className="list-group-item list-group-item-dark">
@@ -179,7 +183,7 @@ function RevisionReportes() {
                       {tipoArchivo === "mov" || tipoArchivo === "mp4" ? (
                         <div>
                           <video
-                            style={{ width: 400, height: 340 }}
+                            style={{ width: 400, height: 400 }}
                             src={
                               "http://192.168.1.75:8080/images/" +
                               archivo +
@@ -191,36 +195,22 @@ function RevisionReportes() {
                       ) : (
                         <div
                           style={{
-                            width: 450,
-                            height: 350,
+                            width: "50%",
+                            height: "100%",
                             overflow: "hidden",
-                            position: "relative",
+                            marginLeft: "25%",
                           }}
                         >
-                          {/* <img
-                            style={{ width: 400, height: 340 }}
-                            src={
-                              "http://192.168.1.75:8080/images/" +
-                              archivo +
-                              "?path=reportes"
-                            }
-                            alt=""
-                            onClick={() => {
-                              window.open(
+                          {
+                            <ReactPanZoom
+                              image={
                                 "http://192.168.1.75:8080/images/" +
-                                  archivo +
-                                  "?path=reportes"
-                              );
-                            }}
-                          /> */}
-                          <ReactPanZoom
-                            image={
-                              "http://192.168.1.75:8080/images/" +
-                              archivo +
-                              "?path=reportes"
-                            }
-                            alt="Image alt text"
-                          />
+                                archivo +
+                                "?path=reportes"
+                              }
+                              alt="La imagen no cargo correctamente"
+                            />
+                          }
                         </div>
                       )}
                     </li>
@@ -228,6 +218,7 @@ function RevisionReportes() {
                 </div>
               </div>
             </div>
+
             <div className="container text-center">
               <ul className="list-group mt-4">
                 <li className="list-group-item list-group-item-dark">

@@ -577,8 +577,8 @@ function Usuarios() {
         </>
       ) : (
         <>
-        <NavBarAdmin />
-        <SinAcceso/>
+          <NavBarAdmin />
+          <SinAcceso />
         </>
       )}
     </>

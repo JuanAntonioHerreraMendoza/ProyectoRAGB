@@ -9,6 +9,7 @@ import { Button, Modal } from "react-bootstrap";
 import {
   cambiarContraseña,
   enviarCodigo,
+  enviarCodigoSesionUsuario,
   existeCodigo,
   existeUsuario,
 } from "../services/ApiRest";
@@ -43,7 +44,11 @@ function Login() {
   const mandejadorSubmit = (e) => {
     setInputsVacios(false);
     e.preventDefault();
-    if (usuario.usuario !== "" && usuario.contraseña !== "") {
+    if (
+      usuario.usuario !== "" &&
+      usuario.contraseña !== "" &&
+      existeUsuario(usuario.usuario)
+    ) {
       //enviarCodigoUsuario(usuario.usuario);
       setModalOpen(true);
     } else {
@@ -52,6 +57,10 @@ function Login() {
   };
 
   const enviarCodigoUsuario = async (correo) => {
+    await enviarCodigoSesionUsuario(correo);
+  };
+
+  const enviarCodigoContraseña = async (correo) => {
     await enviarCodigo(correo);
   };
 
@@ -294,7 +303,7 @@ function Login() {
                 onClick={() => {
                   existeUsuario(correo).then((res) => {
                     if (res) {
-                      //enviarCodigoUsuario(correo)
+                      //enviarCodigoContraseña(correo)
                       setModalContraseña(false);
                       setmodalCambioContraseña(true);
                     }

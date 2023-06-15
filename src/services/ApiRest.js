@@ -111,6 +111,14 @@ export const getConductorInfo = async (licencia, circulacion, placas) => {
   return res;
 };
 
+export const vincularConductorPersona = async (conductor, id) => {
+  let res = {};
+  await axios
+    .put(Apiurl + "conductores?id=" + id, conductor)
+    .then((response) => (res = response.data));
+  return res;
+};
+
 export const suspenderUsuario = async (usuario, fecha) => {
   let res = "";
   await axios
@@ -168,36 +176,52 @@ export const enviarCorreoUsuarioPosible = async (usuario, resultado) => {
     .then((response) => {
       res = response.status;
     });
-  console.log(res);
-};
-
-export const enviarNotificacionMulta= async (token) => {
-  let res = "";
-  let notificacion = {
-    token: token,
-    titulo: "Revision de multa",
-    mensaje: "Una multa fue pagada",
-    data: {},
-  };
-  await axios.post(Apiurl + "notificacion", notificacion).then((response) => {
-    res = response.status;
-  });
   return res;
 };
 
-export const enviarNotificacionR = async (token, estatus) => {
+export const enviarNotificacionMulta = async (correo) => {
   let res = "";
-  let notificacion = {
-    token: token,
-    titulo: "Revision de reporte",
-    mensaje: estatus
-      ? "Tienes un reporte aceptado"
-      : "Tienes un reporte rechazado",
-    data: {},
-  };
-  await axios.post(Apiurl + "notificacion", notificacion).then((response) => {
-    res = response.status;
-  });
+  await axios
+    .get(Apiurl + "tokens/tokenporCorreo?correo=" + correo)
+    .then((response) => {
+      response.data.map(async (token) => {
+        let notificacion = {
+          token: token.token,
+          titulo: "Revision de multa",
+          mensaje: "Una multa fue pagada",
+          data: {},
+        };
+        await axios
+          .post(Apiurl + "notificacion", notificacion)
+          .then((response) => {
+            res = response.status;
+          });
+      });
+    });
+  return res;
+};
+
+export const enviarNotificacionR = async (correo, estatus) => {
+  let res = "";
+  await axios
+    .get(Apiurl + "tokens/tokenporCorreo?correo=" + correo)
+    .then((response) => {
+      response.data.map(async (token) => {
+        let notificacion = {
+          token: token,
+          titulo: "Revision de reporte",
+          mensaje: estatus
+            ? "Tienes un reporte aceptado"
+            : "Tienes un reporte rechazado",
+          data: {},
+        };
+        await axios
+          .post(Apiurl + "notificacion", notificacion)
+          .then((response) => {
+            res = response.status;
+          });
+      });
+    });
   return res;
 };
 
@@ -206,6 +230,16 @@ export const enviarCodigo = async (correo) => {
   await axios.post(Apiurl + "correo?correo=" + correo).then((response) => {
     res = response.status;
   });
+  return res;
+};
+
+export const enviarCodigoSesionUsuario = async (correo) => {
+  let res = "";
+  await axios
+    .post(Apiurl + "correo/sesionUsuario?correo=" + correo)
+    .then((response) => {
+      res = response.status;
+    });
   return res;
 };
 
@@ -247,7 +281,7 @@ export const pagarMulta = async (multa) => {
 
 export const existeCodigo = async (codigo) => {
   let res = false;
-  await axios.post(Apiurl + "codigo", {codigo:codigo}).then((response) => {
+  await axios.post(Apiurl + "codigo", { codigo: codigo }).then((response) => {
     res = response.data;
   });
   return res;
@@ -255,16 +289,20 @@ export const existeCodigo = async (codigo) => {
 
 export const existeUsuario = async (correo) => {
   let res = {};
-  await axios.get(Apiurl + "usuarios/existeUsuario?correo=" + correo).then((response) => {
-    res = response.data;
-  });
+  await axios
+    .get(Apiurl + "usuarios/existeUsuario?correo=" + correo)
+    .then((response) => {
+      res = response.data;
+    });
   return res;
 };
 
 export const getConductor = async (persona) => {
   let res = {};
-  await axios.get(Apiurl + "conductores/getConductor",persona).then((response) => {
-    res = response.data;
-  });
+  await axios
+    .get(Apiurl + "conductores/getConductor", persona)
+    .then((response) => {
+      res = response.data;
+    });
   return res;
 };

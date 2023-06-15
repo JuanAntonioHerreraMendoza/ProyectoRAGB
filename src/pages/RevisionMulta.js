@@ -29,7 +29,7 @@ function RevisionMulta() {
       .then(() => {
         enviarCorreoMulta(multa.idreportadorfk.correo)
           .then(
-            enviarNotificacionMulta("ExponentPushToken[wg6ucrGk7QmGEUntUUBuNR]")
+            enviarNotificacionMulta(multa.idreportadorfk.correo)
           )
           .catch((error) => alert(error));
       })
@@ -41,7 +41,6 @@ function RevisionMulta() {
     obtenerMulta(query.get("id"))
       .then((data) => {
         setMulta(data);
-        console.log(data);
       })
       .catch((error) => alert(error));
   }, []);
