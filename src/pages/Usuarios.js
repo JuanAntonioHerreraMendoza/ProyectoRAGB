@@ -5,7 +5,7 @@ import {
   getUsuario,
   getUsuarios,
   suspenderUsuario,
-} from "../services/ApiRest";
+} from "../services/UsuarioService";
 import { useTable, usePagination, useGlobalFilter } from "react-table";
 import NavBarAdmin from "../components/NavBarAdmin";
 import NavBarSupervisor from "../components/NavBarSupervisor";
@@ -14,6 +14,7 @@ import { Button, Modal } from "react-bootstrap";
 import SinAcceso from "../components/SinAcceso";
 
 function Usuarios() {
+  let fechaHoy = new Date();
   let tipoUsuario = sessionStorage.getItem("idtipousuario");
   const [fecha, setFecha] = useState("");
   const [modalIsOpen, setIsOpen] = useState(false);
@@ -523,6 +524,7 @@ function Usuarios() {
               <input
                 type="date"
                 name="fecha"
+                min={fechaHoy?.toISOString().split("T")[0]}
                 className="form-control"
                 onChange={(e) => setFecha(e.target.value)}
               />

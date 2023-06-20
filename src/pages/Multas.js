@@ -5,7 +5,7 @@ import SinAcceso from "../components/SinAcceso";
 import FiltroGlobal from "../components/FiltroGlobal";
 import { useGlobalFilter, usePagination, useTable } from "react-table";
 import { useNavigate } from "react-router-dom";
-import { getMultas } from "../services/ApiRest";
+import { getMultas } from "../services/MultaService";
 
 function Multas() {
   let tipoUsuario = sessionStorage.getItem("idtipousuario");
@@ -85,7 +85,7 @@ function Multas() {
 
   useEffect(() => {
     obtenerMultas().then((data) => setMultas(data));
-    setPageSize(10);
+    //setPageSize(10);
   }, []);
 
   return (

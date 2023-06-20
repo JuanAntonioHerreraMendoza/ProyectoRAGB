@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
-import {
-  enviarCorreoMulta,
-  enviarNotificacionMulta,
-  enviarNotificacionR,
-  getMulta,
-  pagarMulta,
-} from "../services/ApiRest";
+import { getMulta,pagarMulta } from "../services/MultaService";
+import { enviarCorreoMulta } from "../services/CorreoService";
+import { enviarNotificacionMulta,enviarNotificacionR } from "../services/NotificacionesService";
 import { useLocation, useNavigate } from "react-router-dom";
 import NavBarSupervisor from "../components/NavBarSupervisor";
 import NavBarAdmin from "../components/NavBarAdmin";

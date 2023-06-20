@@ -2,14 +2,11 @@ import React, { createRef, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import NavBarAdmin from "../components/NavBarAdmin";
 import NavBarSupervisor from "../components/NavBarSupervisor";
-import {
-  cambiarEstatus,
-  enviarCorreoReporte,
-  enviarNotificacionR,
-  getConductorInfo,
-  getReporte,
-  nuevaMulta,
-} from "../services/ApiRest";
+import { cambiarEstatus,getReporte } from "../services/ReportesService";
+import { nuevaMulta } from "../services/MultaService";
+import { enviarCorreoReporte } from "../services/CorreoService";
+import { enviarNotificacionR } from "../services/NotificacionesService";
+import { getConductorInfo } from "../services/ConductorService";
 import { MapContainer, Marker, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import ReactPanZoom from "react-image-pan-zoom-rotate";
@@ -89,7 +86,7 @@ function RevisionReportes() {
         alert(error);
         return;
       });
-    enviarNotificacionR("ExponentPushToken[wg6ucrGk7QmGEUntUUBuNR]", false);
+    enviarNotificacionR(reporte.idreportadorfk.correo, false);
     navigate("/reportes");
   };
   const AceptarReporte = async (reporte) => {

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import NavBarAdmin from "../components/NavBarAdmin";
 import NavBarSupervisor from "../components/NavBarSupervisor";
-import { getUsuariosPosibles } from "../services/ApiRest";
+import { getUsuariosPosibles } from "../services/UsuariosPosiblesService";
 import { useTable, usePagination, useGlobalFilter } from "react-table";
 import FiltroGlobal from "../components/FiltroGlobal";
 import { useNavigate } from "react-router-dom";
@@ -86,7 +86,7 @@ function PosiblesUsuarios() {
     obtenerUsuarios().then((data) => {
       setUsuariosP(data);
     });
-    setPageSize(10);
+    //setPageSize(10);
   }, []);
 
   return (

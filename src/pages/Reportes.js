@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { getReportes } from "../services/ApiRest";
+import { getReportes } from "../services/ReportesService";
 import { useTable, usePagination, useGlobalFilter } from "react-table";
 import NavBarAdmin from "../components/NavBarAdmin";
 import NavBarSupervisor from "../components/NavBarSupervisor";

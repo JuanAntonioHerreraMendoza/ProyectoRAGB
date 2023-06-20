@@ -2,20 +2,29 @@ import React, { useState } from "react";
 //css
 import "../assets/Login.css";
 //servicios
-import { login } from "../services/UsuarioService";
+import {
+  cambiarContraseña,
+  editarUsuario,
+  login,
+} from "../services/UsuarioService";
 //libreria
 import { useNavigate } from "react-router-dom";
 import { Button, Modal } from "react-bootstrap";
+import { validarContraseña } from "../services/Validaciones";
 import {
-  cambiarContraseña,
   enviarCodigo,
   enviarCodigoSesionUsuario,
-  existeCodigo,
-  existeUsuario,
-} from "../services/ApiRest";
-import { validarContraseña } from "../services/Validaciones";
+} from "../services/CorreoService";
+import { existeUsuario } from "../services/UsuarioService";
+import { existeCodigo } from "../services/NotificacionesService";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
 function Login() {
+  let fechaHoy = new Date();
+  const MySwal = withReactContent(Swal);
+  const [showPassword, setshowPassword] = useState(false);
+  const [showPassword2, setshowPassword2] = useState(false);
   const [modal, setModalOpen] = useState(false);
   const [modalContraseña, setModalContraseña] = useState(false);
   const [modalCambioContraseña, setmodalCambioContraseña] = useState(false);
@@ -42,6 +51,7 @@ function Login() {
   const navigate = useNavigate();
 
   const mandejadorSubmit = (e) => {
+    setCodigo("");
     setInputsVacios(false);
     e.preventDefault();
     if (
@@ -74,46 +84,71 @@ function Login() {
   const manejadorBoton = async () => {
     setloading(true);
     let response = await login(usuario);
-    if (response.status === 200) {
-      sessionStorage.setItem("userInfo", JSON.stringify(response.data));
-      let tUsuario = response.data.tipousuariofk.idtipousuario;
-      if (tUsuario === 1 || tUsuario === 2) {
-        sessionStorage.setItem("idusuario", response.data.idusuarios);
-        sessionStorage.setItem(
-          "idpersona",
-          response.data.idpersonafk.idpersona
-        );
-        sessionStorage.setItem(
-          "idtipousuario",
-          response.data.tipousuariofk.idtipousuario
-        );
+    if (
+      fechaHoy.getTime() <
+        Date.parse(
+          JSON.stringify(response.data.idpersonafk.fechasuspencion).split(
+            "T"
+          )[0]
+        ) &&
+      response.data.idpersonafk.activo === false
+    ) {
+      return MySwal.fire({
+        icon: "error",
+        title: (
+          <p>Tienes una suspencion hasta el dia: <br/>
+            {
+              JSON.stringify(response.data.idpersonafk.fechasuspencion).split(
+                "T"
+              )[0]
+            }"
+          </p>
+        ),
+      }).then(setloading(false));
+    } else {
+      response.data.idpersonafk.activo = true;
+      await editarUsuario(response.data);
+      if (response.status === 200) {
+        sessionStorage.setItem("userInfo", JSON.stringify(response.data));
+        let tUsuario = response.data.tipousuariofk.idtipousuario;
+        if (tUsuario === 1 || tUsuario === 2) {
+          sessionStorage.setItem("idusuario", response.data.idusuarios);
+          sessionStorage.setItem(
+            "idpersona",
+            response.data.idpersonafk.idpersona
+          );
+          sessionStorage.setItem(
+            "idtipousuario",
+            response.data.tipousuariofk.idtipousuario
+          );
+          setloading(false);
+          navigate("/home", { state: { logeado: true } });
+        } else {
+          seterror({
+            error: true,
+            errorMsg: "Error: Usuario no encontrado",
+          });
+          setloading(false);
+        }
+      } else if (response === "errorConexion") {
+        seterror({
+          error: true,
+          errorMsg: "Error: Ocurrio un problema",
+        });
         setloading(false);
-        navigate("/home", { state: { logeado: true } });
+      } else if (response === "UYCI") {
+        seterror({
+          error: true,
+          errorMsg: "Usuario y/o Constraseña Incorrectos",
+        });
+        setloading(false);
       } else {
         seterror({
           error: true,
-          errorMsg: "Error: Usuario no encontrado",
+          errorMsg: "Usuario y/o Constraseña Incorrectos",
         });
         setloading(false);
       }
-    } else if (response === "errorConexion") {
-      seterror({
-        error: true,
-        errorMsg: "Error: Ocurrio un problema",
-      });
-      setloading(false);
-    } else if (response === "UYCI") {
-      seterror({
-        error: true,
-        errorMsg: "Usuario y/o Constraseña Incorrectos",
-      });
-      setloading(false);
-    } else {
-      seterror({
-        error: true,
-        errorMsg: "Usuario y/o Constraseña Incorrectos",
-      });
-      setloading(false);
     }
   };
 
@@ -179,14 +214,28 @@ function Login() {
                   </div>
                   <div className="form-group">
                     <label>Contraseña: </label>
-                    <br />
-                    <input
-                      type="password"
-                      className="form-control"
-                      name="contraseña"
-                      placeholder="Contraseña"
-                      onChange={(e) => manejadorChange(e)}
-                    />
+
+                    <div className="input-group mb-3">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        className="form-control"
+                        placeholder="Contraseña"
+                        name="contraseña"
+                        onChange={(e) => manejadorChange(e)}
+                      />
+                      <button
+                        className="btn btn-secondary"
+                        type="button"
+                        id="button-addon2"
+                        onClick={() => {
+                          setshowPassword(!showPassword);
+                        }}
+                      >
+                        <ion-icon
+                          name={showPassword ? "eye-off" : "eye"}
+                        ></ion-icon>
+                      </button>
+                    </div>
                   </div>
                   {error.error === true && (
                     <div className="alert alert-danger" role="alert">
@@ -328,7 +377,7 @@ function Login() {
                 <></>
               )}
               Ingrese el codigo que se la enviado a su correo para cambiar su
-              contraseña
+              contraseña:
               <div className="input-group input-group-sm my-3">
                 <input
                   type="text"
@@ -345,16 +394,41 @@ function Login() {
               </div>
               <div className="input-group input-group-sm my-3">
                 <input
-                  type="text"
+                  type={showPassword2 ? "text" : "password"}
                   className="form-control"
-                  aria-label="Sizing example input"
-                  aria-describedby="inputGroup-sizing-sm"
-                  placeholder="Escriba su nueva contraseña..."
-                  onChange={(e) => {
-                    setContraseña(e.target.value);
-                  }}
+                  placeholder="Contraseña"
+                  name="contraseña"
+                  onChange={(e) => manejadorChange(e)}
                 />
+                <button
+                  className="btn btn-secondary"
+                  type="button"
+                  id="button-addon2"
+                  onClick={() => {
+                    setshowPassword2(!showPassword2);
+                  }}
+                >
+                  <ion-icon name={showPassword2 ? "eye-off" : "eye"}></ion-icon>
+                </button>
               </div>
+              <ul className="list-group">
+                <li className="fs-6">La contraseña no puede tener espacios</li>
+                <li className="fs-6">
+                  La contraseña debe tener al menos una letra mayuscula
+                </li>
+                <li className="fs-6">
+                  La contraseña debe tener al menos una letra minuscula
+                </li>
+                <li className="fs-6">
+                  La contraseña debe tener al menos un digito
+                </li>
+                <li className="fs-6">
+                  La contraseña debe tener al menos un caracter especial
+                </li>
+                <li className="fs-6">
+                  La longitud de la contraseña debe esta entre 8 y 16 caracteres
+                </li>
+              </ul>
             </Modal.Body>
             <Modal.Footer>
               <Button

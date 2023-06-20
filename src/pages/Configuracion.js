@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, {useState } from "react";
 import NavBarSupervisor from "../components/NavBarSupervisor";
 import NavBarAdmin from "../components/NavBarAdmin";
-import { cambiarContraseña, enviarCodigo } from "../services/ApiRest";
+import { cambiarContraseña } from "../services/UsuarioService";
+import { enviarCodigo } from "../services/CorreoService";
 import { validarContraseña } from "../services/Validaciones";
 import { useNavigate } from "react-router-dom";
 
@@ -9,6 +10,7 @@ function Configuracion() {
   const navigate = useNavigate();
   let tipoUsuario = sessionStorage.getItem("idtipousuario");
   let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+  const [showPassword, setshowPassword] = useState(false);
   const [show, setShow] = useState(false);
   const [codigo, setCodigo] = useState("");
   const [contraseña, setContraseña] = useState("");
@@ -22,6 +24,7 @@ function Configuracion() {
       setMensajeError(checkPass);
       return;
     }
+
     cambiarContraseña(codigo, contraseña).then((res) => {
       if (!res) {
         setMensajeError("El codigo no coincide");
@@ -56,7 +59,7 @@ function Configuracion() {
               disabled={show}
               onClick={() => {
                 setShow(true);
-                //enviarCodigo(userInfo.idpersonafk.correo);
+                enviarCodigo(userInfo.idpersonafk.correo);
               }}
             >
               Cambiar contraseña
@@ -73,15 +76,49 @@ function Configuracion() {
                     onChange={(e) => setCodigo(e.target.value)}
                   />
                 </div>
-                <div className="container input-group mb-3">
+                <div class="container text-start">
+                  <ul className="list-group">
+                    <li className="fs-6">
+                      La contraseña no puede tener espacios
+                    </li>
+                    <li className="fs-6">
+                      La contraseña debe tener al menos una letra mayuscula
+                    </li>
+                    <li className="fs-6">
+                      La contraseña debe tener al menos una letra minuscula
+                    </li>
+                    <li className="fs-6">
+                      La contraseña debe tener al menos un digito
+                    </li>
+                    <li className="fs-6">
+                      La contraseña debe tener al menos un caracter especial
+                    </li>
+                    <li className="fs-6">
+                      La longitud de la contraseña debe esta entre 8 y 16
+                      caracteres
+                    </li>
+                  </ul>
+                </div>
+                <div className="container input-group my-3">
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     className="form-control"
                     placeholder="Contraseña"
-                    aria-label="Contraseña"
-                    aria-describedby="basic-addon1"
+                    name="contraseña"
                     onChange={(e) => setContraseña(e.target.value)}
                   />
+                  <button
+                    className="btn btn-secondary"
+                    type="button"
+                    id="button-addon2"
+                    onClick={() => {
+                      setshowPassword(!showPassword);
+                    }}
+                  >
+                    <ion-icon
+                      name={showPassword ? "eye-off" : "eye"}
+                    ></ion-icon>
+                  </button>
                 </div>
                 <button
                   className="btn btn-primary"

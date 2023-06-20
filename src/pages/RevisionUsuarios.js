@@ -3,14 +3,15 @@ import NavBarSupervisor from "../components/NavBarSupervisor";
 import NavBarAdmin from "../components/NavBarAdmin";
 import SinAcceso from "../components/SinAcceso";
 import {
+  getUsuarioPosible,
   aceptarUsuarioPosible,
   deleteUsuarioPosible,
-  enviarCorreoUsuarioPosible,
-  getConductor,
+} from "../services/UsuariosPosiblesService";
+import {
   getConductorInfo,
-  getUsuarioPosible,
   vincularConductorPersona,
-} from "../services/ApiRest";
+} from "../services/ConductorService";
+import { enviarCorreoUsuarioPosible } from "../services/CorreoService";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button, Carousel, Modal } from "react-bootstrap";
 import Swal from "sweetalert2";
@@ -75,8 +76,24 @@ function RevisionUsuarios() {
     usuario.idpersonafk = persona;
 
     await aceptarUsuarioPosible(usuario).then((res) => {
-      enviarCorreoUsuarioPosible(usuarioP.correo, true);
-      vincularConductorPersona(conductor, res);
+      enviarCorreoUsuarioPosible(usuarioP.correo, true).catch((e) =>
+        MySwal.fire({
+          icon: "error",
+          title: <p>Ha sucedido un error</p>,
+          text: <p className="text-break">{e}</p>,
+        }).then(() => {
+          navigate("/posiblesUsuarios");
+        })
+      );
+      vincularConductorPersona(conductor, res).catch((e) =>
+        MySwal.fire({
+          icon: "error",
+          title: <p>Ha sucedido un error</p>,
+          text: <p className="text-break">{e}</p>,
+        }).then(() => {
+          navigate("/posiblesUsuarios");
+        })
+      );
     });
   };
 
