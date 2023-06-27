@@ -36,7 +36,7 @@ function Configuracion() {
 
   return (
     <div className="configuracion text-center">
-      {tipoUsuario === "1" ? <NavBarSupervisor /> : <NavBarAdmin />}
+      {tipoUsuario === "4" ? <NavBarSupervisor /> : <NavBarAdmin />}
       <h1>Configuracion</h1>
       <div className="col mx-5">
         {alerta ? (

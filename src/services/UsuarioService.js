@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const baseUrl = "https://3ec0-187-221-239-17.ngrok-free.app/usuarios";
+export const baseUrl = "https://842f-187-221-239-17.ngrok-free.app/usuarios";
 axios.defaults.headers.common['ngrok-skip-browser-warning'] = "any value";
 
 export async function login(usuario) {

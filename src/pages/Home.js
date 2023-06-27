@@ -7,7 +7,7 @@ function Home() {
   let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
   return (
     <>
-      {tipoUsuario === "1" ? (
+      {tipoUsuario === "4" ? (
         <>
           <NavBarSupervisor />
           <div className="container text-center">

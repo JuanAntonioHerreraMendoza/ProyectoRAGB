@@ -149,7 +149,7 @@ function Usuarios() {
   }, []);
   return (
     <>
-      {tipoUsuario === "1" ? (
+      {tipoUsuario === "4" ? (
         <>
           <NavBarSupervisor />{" "}
           <div className="reports">
