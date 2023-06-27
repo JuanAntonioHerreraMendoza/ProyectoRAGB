@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const baseUrl = "http://localhost:8080/usuarios";
+export const baseUrl = "https://3ec0-187-221-239-17.ngrok-free.app/usuarios";
+axios.defaults.headers.common['ngrok-skip-browser-warning'] = "any value";
 
 export async function login(usuario) {
     let res = undefined;
@@ -16,7 +17,6 @@ export async function login(usuario) {
         }
     ).catch(
         error => {
-            console.log(error);
             res = "errorConexion";
         }
     );
@@ -30,19 +30,7 @@ export async function createUsuario(user) {
         res = response;
     }).catch(error =>{
         console.log(error);
-    });;
-    return res;
-};
-
-export async function getSupervisor() {
-    let res = undefined;
-    await axios.get(baseUrl + "/usuarioslist").then(response => {
-        res = response;
-    }).catch(
-        error => {
-            console.log(error);
-        }
-    );
+    });
     return res;
 };
 

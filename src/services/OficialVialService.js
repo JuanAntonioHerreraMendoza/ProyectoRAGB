@@ -1,12 +1,11 @@
 import axios from "axios";
 
-const baseUrl = "https://3ec0-187-221-239-17.ngrok-free.app/personal";
-axios.defaults.headers.common['ngrok-skip-browser-warning'] = "any value";
+const baseUrl = "http://localhost:8080/oficial";
 
-export async function getPersonal() {
+export async function getOficialesViales() {
     let res = undefined;
 
-    await axios.get(baseUrl+"/all").then(
+    await axios.get(baseUrl + "/all").then(
         response => {
             res = response.data;
         }
@@ -20,10 +19,10 @@ export async function getPersonal() {
 };
 
 
-export async function createPersonal(personal) {
+export async function createOficial(oficial) {
     let res = undefined;
 
-    await axios.post(baseUrl + "/guardar", personal).then(
+    await axios.post(baseUrl + "/guardar", oficial).then(
         response => {
             res = response;
         }
@@ -37,10 +36,10 @@ export async function createPersonal(personal) {
     return res;
 };
 
-export async function updatePersonal(personal) {
+export async function updateOficial(oficial) {
     let res = undefined;
 
-    await axios.put(baseUrl + "/actualizar", personal).then(
+    await axios.put(baseUrl + "/actualizar", oficial).then(
         response => {
             res = response;
         }
@@ -54,10 +53,10 @@ export async function updatePersonal(personal) {
     return res;
 };
 
-export async function bloquearPersonal(id) {
+export async function bloquearOficial(placa) {
     let res = undefined;
 
-    await axios.post(baseUrl + "/eliminar?id=" + id).then(
+    await axios.post(baseUrl + "/eliminar?placa=" + placa).then(
         response => {
             res = response;
         }
@@ -70,10 +69,10 @@ export async function bloquearPersonal(id) {
     return res;
 };
 
-export async function createPersonaPersonal(persona) {
+export async function createPersonaOficial(oficial) {
     let res = undefined;
 
-    await axios.post(baseUrl + "/crearPersona", persona).then(
+    await axios.post(baseUrl + "/crearPersona", oficial).then(
         response => {
             res = response;
         }
@@ -86,10 +85,10 @@ export async function createPersonaPersonal(persona) {
     return res;
 };
 
-export async function searchPersonalById(id) {
+export async function searchOficialByPlaca(placa) {
     let res = undefined;
 
-    await axios.get(baseUrl + "/" + id).then(
+    await axios.get(baseUrl + "/" + placa).then(
         response => {
             res = response;
         }
@@ -104,10 +103,10 @@ export async function searchPersonalById(id) {
 
 
 
-export async function suspenderPersonal(id, fecha) {
+export async function suspenderOficial(placa, fecha) {
     let res = undefined;
 
-    await axios.post(baseUrl + "/suspenderPersonal?id=" + id + "&fecha=" + fecha).then(
+    await axios.post(baseUrl + "/suspenderOficial?placa=" + placa + "&fecha=" + fecha).then(
         response => {
             res = response;
         }

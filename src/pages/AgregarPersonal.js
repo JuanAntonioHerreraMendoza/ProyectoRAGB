@@ -5,7 +5,7 @@ import "leaflet/dist/leaflet.css";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { createPersonaPersonal, createPersonal } from "../services/PersonalService";
-import { createUsuario, existeUsuario } from "../services/UsuarioSevice";
+import { createUsuario, existeUsuario } from "../services/UsuarioService";
 import { validarContraseña } from "../services/Validaciones";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
@@ -156,7 +156,7 @@ function AgregarPersonal() {
     filterTimeout = setTimeout(function async() {
       existeUsuario(e.target.value).then(
         respuesta => {
-          if (respuesta.data) {
+          if (respuesta) {
             seterrorEmail({
               errorEmail: "occupied",
               errorMsg: "El correo ya esta ocupado!",
@@ -185,14 +185,14 @@ function AgregarPersonal() {
         icon: "success",
         title: <p>Se ha creado el personal con exito!</p>,
       }).then(() => {
-        navigate("/supervisor");
+        //navigate("/supervisor");
       });
     } else {
       MySwal.fire({
         icon: "error",
         title: <p>No se ha podido crear el personal.</p>,
       }).then(() => {
-        navigate("/supervisor");
+        //navigate("/supervisor");
       });
     }
   };

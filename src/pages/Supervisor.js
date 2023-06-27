@@ -151,26 +151,26 @@ function Supervisor() {
   };
 
   const alertaConfirmacion = (resolucion) => {
-    if (resolucion = "blockP") {
+    if (resolucion === "blockP") {
       MySwal.fire({
         icon: "error",
         title: <p>Se ha eliminado el personal con exito!</p>,
       }).then(() => {
-        navigate("/supervisor");
+        window.location.href = window.location.href;
       });
-    } else if (resolucion = "suspencionP") {
+    } else if (resolucion === "suspencionP") {
       MySwal.fire({
         icon: "warning",
         title: <p>Se suspendio al personal!</p>,
       }).then(() => {
-        navigate("/supervisor");
+        window.location.href = window.location.href;
       });
-    } else if (resolucion = "statusError") {
+    } else if (resolucion === "statusError") {
       MySwal.fire({
         icon: "question",
         title: <p>Ocurrio un error, intentalo de nuevo!</p>,
       }).then(() => {
-        navigate("/supervisor");
+        window.location.href = window.location.href;
       });
     }
   };

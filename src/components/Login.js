@@ -84,71 +84,72 @@ function Login() {
   const manejadorBoton = async () => {
     setloading(true);
     let response = await login(usuario);
-    if (
-      fechaHoy.getTime() <
+    if (response.status === 200) {
+      if (
+        fechaHoy.getTime() <
         Date.parse(
-          JSON.stringify(response.data.idpersonafk.fechasuspencion).split(
+          JSON.stringify(response.data?.idpersonafk.fechasuspencion).split(
             "T"
           )[0]
         ) &&
-      response.data.idpersonafk.activo === false
-    ) {
-      return MySwal.fire({
-        icon: "error",
-        title: (
-          <p>Tienes una suspencion hasta el dia: <br/>
-            {
-              JSON.stringify(response.data.idpersonafk.fechasuspencion).split(
-                "T"
-              )[0]
-            }"
-          </p>
-        ),
-      }).then(setloading(false));
-    } else {
+        response.data?.idpersonafk.activo === false
+      ) {
+        return MySwal.fire({
+          icon: "error",
+          title: (
+            <p>Tienes una suspencion hasta el dia: <br />
+              {
+                JSON.stringify(response.data.idpersonafk.fechasuspencion).split(
+                  "T"
+                )[0]
+              }"
+            </p>
+          ),
+        }).then(
+          setloading(false)
+        )
+      }
       response.data.idpersonafk.activo = true;
       await editarUsuario(response.data);
-      if (response.status === 200) {
-        sessionStorage.setItem("userInfo", JSON.stringify(response.data));
-        let tUsuario = response.data.tipousuariofk.idtipousuario;
-        if (tUsuario === 1 || tUsuario === 2) {
-          sessionStorage.setItem("idusuario", response.data.idusuarios);
-          sessionStorage.setItem(
-            "idpersona",
-            response.data.idpersonafk.idpersona
-          );
-          sessionStorage.setItem(
-            "idtipousuario",
-            response.data.tipousuariofk.idtipousuario
-          );
-          setloading(false);
-          navigate("/home", { state: { logeado: true } });
-        } else {
-          seterror({
-            error: true,
-            errorMsg: "Error: Usuario no encontrado",
-          });
-          setloading(false);
-        }
-      } else if (response === "errorConexion") {
-        seterror({
-          error: true,
-          errorMsg: "Error: Ocurrio un problema",
-        });
+      sessionStorage.setItem("userInfo", JSON.stringify(response.data));
+      let tUsuario = response.data.tipousuariofk.idtipousuario;
+      if (tUsuario === 4 || tUsuario === 5) {
+        sessionStorage.setItem("idusuario", response.data.idusuarios);
+        sessionStorage.setItem(
+          "idpersona",
+          response.data.idpersonafk.idpersona
+        );
+        sessionStorage.setItem(
+          "idtipousuario",
+          response.data.tipousuariofk.idtipousuario
+        );
         setloading(false);
-      } else if (response === "UYCI") {
-        seterror({
-          error: true,
-          errorMsg: "Usuario y/o Constraseña Incorrectos",
-        });
-        setloading(false);
+        navigate("/home", { state: { logeado: true } });
       } else {
         seterror({
           error: true,
-          errorMsg: "Usuario y/o Constraseña Incorrectos",
+          errorMsg: "Error: Usuario no encontrado",
         });
         setloading(false);
       }
+    } else if (response === "errorConexion") {
+      seterror({
+        error: true,
+        errorMsg: "Error: Ocurrio un problema",
+      });
+      setloading(false);
+    } else if (response === "UYCI") {
+      seterror({
+        error: true,
+        errorMsg: "Usuario y/o Constraseña Incorrectos",
+      });
+      setloading(false);
+    } else {
+      seterror({
+        error: true,
+        errorMsg: "Usuario y/o Constraseña Incorrectos",
+      });
+      setloading(false);
     }
   };
 
@@ -398,7 +399,7 @@ function Login() {
                   className="form-control"
                   placeholder="Contraseña"
                   name="contraseña"
-                  onChange={(e) => manejadorChange(e)}
+                  onChange={(e) => setContraseña(e.target.value)}
                 />
                 <button
                   className="btn btn-secondary"

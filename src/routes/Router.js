@@ -9,13 +9,16 @@ import Reportes from "../pages/Reportes";
 import Usuarios from "../pages/Usuarios";
 import Configuracion from "../pages/Configuracion";
 import RevisionReportes from "../pages/RevisionReportes";
+import RevisionMulta from "../pages/RevisionMulta";
 import PosiblesUsuarios from "../pages/PosiblesUsuarios";
 import RevisionUsuarios from "../pages/RevisionUsuarios";
+import Multas from "../pages/Multas"
 import NotFound from "../components/NotFound";
 import PrivateRoute from "./PrivateRoute";
-import Multas from "../pages/Multas";
-import RevisionMulta from "../pages/RevisionMulta";
-
+import AgregarPersonal from "../pages/AgregarPersonal";
+import EditarPersonal from "../pages/EditarPersonal";
+import AgregarOficialVial from "../pages/AgregarOficialVial";
+import EditarOficialVial from "../pages/EditarOficialVial";
 function Router() {
   return (
     <Routes>
@@ -32,6 +35,10 @@ function Router() {
       <Route path="/multas" element={<PrivateRoute><Multas /></PrivateRoute>} />
       <Route path="/revisionMulta" element={<PrivateRoute><RevisionMulta /></PrivateRoute>} />
       <Route path="*" element={<NotFound />} />
+      <Route path="/agregarPersonal" element={<PrivateRoute><AgregarPersonal/></PrivateRoute>}/>
+      <Route path="/editarPersonal" element={<PrivateRoute><EditarPersonal/></PrivateRoute>}/>
+      <Route path="/agregarOficialVial" element={<PrivateRoute><AgregarOficialVial/></PrivateRoute>}/>
+      <Route path="/editarOficialVial" element={<PrivateRoute><EditarOficialVial/></PrivateRoute>}/>
     </Routes>
   );
 }
